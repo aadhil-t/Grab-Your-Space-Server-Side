@@ -56,23 +56,69 @@ const UserSignin = async (req, res) => {
         //     return res.json({userData,alert:'Registration',status:true})
 
 
+// const userLogin = async(req,res)=>{
+//     try {
+     
+//         const {email,password} = req.body
+//         console.log(req.body)
+//         const emailExist = await User.findOne({email:email})
+//         if(emailExist){
+//             const access = await bcrypt.compare(password,emailExist.password);
+//             console.log(access);
+//             if(access){
+//                 const token = jwt.sign({ userId: emailExist.id},process.env.UserSecret,{expiresIn: '1h'})
+//                 res.status(200).json({created:true,userData:emailExist,status:true,token});
+//             }else{
+//                 res.status(400).json({alert:"password is incorrect"})
+//             }
+//         }else{
+//             res.json({alert:"No account in this email",status:false})   
+//         }
+//     } catch (error) {
+//         console.log(error)
+//     }
+// }
+
 const userLogin = async(req,res)=>{
     try {
-     
-        const {email,password} = req.body
-        console.log(req.body)
-        const emailExist = await User.findOne({email:email})
-        if(emailExist){
-            const access = await bcrypt.compare(password,emailExist.password);
-            console.log(access);
-            if(access){
-                const token = jwt.sign({ userId: emailExist.id},process.env.UserSecret,{expiresIn: '1h'})
-                res.status(200).json({created:true,userData:emailExist,status:true,token});
-            }else{
-                res.status(400).json({alert:"password is incorrect"})
+        const {email,password,id} = req.body
+        console.log(email,id)
+        if(id){
+            const exist = await User.findOne({password:id})
+            console.log(exist,"anas")
+            if(!exist){
+                res.status(400).json({message:"You don't have Account please sign up"})
             }
-        }else{
-            res.json({alert:"No account in this email",status:false})
+            else{
+                const token = jwt.sign({ userId: exist.id},process.env.UserSecret,{expiresIn: '1h'})
+                res.status(200).json({created:true,userData:exist,status:true,token}); 
+            }
+        }
+        else{
+            const emailExist = await User.findOne({email:email});
+            if(!emailExist){
+                return res.status(400).json({message:"User not found"})
+            }
+            else{
+                const access = await bcrypt.compare( password, emailExist.password);
+                if(!access){
+                    return res.status(400).json({message:"Entered password is incorrect"})
+                }
+                else{
+                    if(emailExist.is_blocked){
+                        return res.status(400).json({message:"Your Account is blocked by admin"})
+                    }
+                    else{
+                        if(!emailExist.is_verified){
+                            return res.status(400).json({message:"Your Account is not verified please sign up"})
+                        }
+                        else{
+                            const token = jwt.sign({ userId: emailExist.id},process.env.UserSecret,{expiresIn: '1h'})
+                            res.status(200).json({created:true,userData:emailExist,status:true,token,message:"Successfully log in"}); 
+                        }
+                    }
+                }
+            }
         }
     } catch (error) {
         console.log(error)
@@ -151,11 +197,10 @@ const SignupWithGoogle = async(req,res)=>{
         if(exist){
             return res.status(200).json({created:false,message:"email Already exist"});
         }else{
-            const hashPass = await bcrypt.hash(id,10);
             const newUser = new User({
                 name:name,
                 email:email,
-                password: hashPass
+                password: id,
             });
             let user = await newUser.save().then(console.log("saved"))
             await User.updateOne({_id:user._id},{$set:{verified: true}})
@@ -176,6 +221,12 @@ const SendMail = async(name,email,id,purpose,token)=>{
         for(let i=0; i<4; i++){ 
             otp+=digits[Math.floor(Math.random()*10)];
         }
+        console.log(id,"adfghj"   );
+
+        
+        const v = await User.updateOne({_id:id},{$set:{otp:otp}})
+        console.log(v,'opkjh');
+
         let content;
         if(purpose == "user verification"){
             content = `<html>
@@ -260,7 +311,7 @@ const SentForgotPasswordMail = async(req,res)=>{
         await User.updateOne({email:email},{$set:{token:token}})
         if(UserData){
             SendMail(UserData.name, UserData.email, UserData._id, "forgot password", token)
-            res.status(200).json({message:"Check your email"})
+            res.status(200).json({message:"Check your email",id:UserData._id})
         }else{
             res.status(400).json({message:"Something went wrong"})
         }
@@ -273,6 +324,7 @@ const SentForgotPasswordMail = async(req,res)=>{
 const ChangePassword = async(req,res)=>{
     try {
         const {password,id,token} = req.body
+        console.log(req.body);
         const pass = await bcrypt.genSalt(10);
         const hashPassword = await bcrypt.hash(password,pass)
 
@@ -282,6 +334,7 @@ const ChangePassword = async(req,res)=>{
         }
    
         const userData = await User.updateOne({ _id:id }, {$set: { password:hashPassword }});
+        console.log(userData,"userdata")
         if(userData){
             res.status(200).json({message:"Password successfully changed"})
         }
@@ -291,6 +344,27 @@ const ChangePassword = async(req,res)=>{
         }
     } catch (error) {
         console.log(error)
+    }
+}
+
+
+const PassOtpVerify = async(req,res)=>{
+    try {
+        const {otp,id} = req.body
+        console.log(otp,id)
+        console.log(req.body);
+
+        const userData = await User.findOne({_id:id});
+        console.log(userData.otp)
+
+        if(otp == userData.otp){
+            return res.status(200).json({message:"OTP is valid"})
+        }
+        else{
+            return res.status(400).json({message:"OTP is incorrect"})
+        }
+    } catch (error) {
+        
     }
 }
 
@@ -305,4 +379,5 @@ module.exports={
     UserOtpVerify,
     SentForgotPasswordMail,
     ChangePassword,
+    PassOtpVerify
 }

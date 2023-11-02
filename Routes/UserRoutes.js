@@ -15,4 +15,5 @@ router.post("/googleSignup",userController.SignupWithGoogle);
 router.post("/otpverified",userController.UserOtpVerify)
 router.post('/forgotmail',userController.SentForgotPasswordMail);
 router.post('/changepass',userController.ChangePassword);
-module.exports = router
+router.post('/passotverify',userController.PassOtpVerify);
+module.exports = router 
