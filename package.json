@@ -11,6 +11,8 @@
   "dependencies": {
     "axios": "^1.5.1",
     "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "env": "^0.0.2",

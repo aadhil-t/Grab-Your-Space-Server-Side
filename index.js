@@ -4,6 +4,10 @@ const cors = require ('cors')
 const userRoutes = require("./Routes/UserRoutes")
 const mongoose = require('mongoose')
 const adminRoute = require("./Routes/AdminRoutes")
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const dotenv = require('dotenv');
+dotenv.config()
 mongoose.connect(process.env.Mongoconnect,{
 
 }).then(()=>{
@@ -14,6 +18,9 @@ mongoose.connect(process.env.Mongoconnect,{
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(cookieParser());
 app.use(cors({
     origin:[process.env.OrginPort],
     method:['GET','POST','PUT'],
@@ -22,5 +29,5 @@ app.use(cors({
 app.use('/',userRoutes)
 app.use('/admin',adminRoute)
 app.listen(process.env.Port,()=>{
-    console.log("Server is Running ");
+    console.log(`Server is Running at ${process.env.Port}`);
 })
