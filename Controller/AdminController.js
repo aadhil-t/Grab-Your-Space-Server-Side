@@ -19,7 +19,7 @@ const AdminLogin = async(req,res)=>{
         const {email,password} = req.body
         const emailExist = await User.findOne({email:email});
         if(emailExist){
-            if(emailExist.is_admin === 1){
+            if(emailExist.is_admin === true){
                 const access = await bcrypt.compare(password,emailExist.password)
                 if(access){
                     const adminToken = jwt.sign({ adminId: emailExist._id},process.env.AdminSecret,{ expiresIn: "1h"})
@@ -41,7 +41,7 @@ const AdminLogin = async(req,res)=>{
 const ViewUserList = async(req,res)=>{
     try {
         console.log("kkkk")
-        const UserDetails = await User.find({is_admin:0})
+        const UserDetails = await User.find({is_admin:false})
         console.log(UserDetails,"hahaha")
         res.json({UserData:UserDetails})
     } catch (error) {

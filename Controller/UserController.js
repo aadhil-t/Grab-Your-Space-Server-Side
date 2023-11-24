@@ -86,21 +86,29 @@ const userLogin = async (req, res) => {
   try {
     console.log("login");
     const { email, password, id } = req.body;
-    console.log(email, id);
+    console.log(req.body, "hhhhhhhhhhhhhhhhhhhh");
     if (id) {
       const exist = await User.findOne({ password: id });
       console.log(exist, "anas");
       if (!exist) {
-        res
+        return res
           .status(400)
           .json({ message: "You don't have Account please sign up" });
       } else {
-        const token = jwt.sign({ userId: exist.id }, process.env.UserSecret, {
-          expiresIn: "1h",
-        });
-        res
-          .status(200)
-          .json({ created: true, userData: exist, status: true, token });
+        if(exist.is_blocked == true){
+          return res
+          .status(400)
+          .json({ message: "Your Account is blocked by admin" });
+        }
+        else{
+          const token = jwt.sign({ userId: exist.id }, process.env.UserSecret, {
+            expiresIn: "1h",
+          });
+          console.log(token);
+          return res
+            .status(200)
+            .json({ created: true, userData: exist, status: true, token });
+        }
       }
     } else {
       const emailExist = await User.findOne({ email: email });
@@ -109,7 +117,7 @@ const userLogin = async (req, res) => {
       } else {
         const access = await bcrypt.compare(password, emailExist.password);
         if (!access) {
-          return res
+          return res  
             .status(400)
             .json({ message: "Entered password is incorrect" });
         } else {
@@ -130,7 +138,8 @@ const userLogin = async (req, res) => {
                 process.env.UserSecret,
                 { expiresIn: "1h" }
               );
-              res
+              console.log(token);
+              return res
                 .status(200)
                 .json({
                   created: true,
@@ -151,15 +160,15 @@ const userLogin = async (req, res) => {
 
 const ViewProfile = async (req, res) => {
   try {
-   
-        
+
+
     const id = req.headers.userId;
     console.log(id)
     const data = await User.findById(id);
     if (data) {
-     return res.status(200).json({ data: data });
+      return res.status(200).json({ data: data });
     } else {
-     return res.status(200).json({ message: "Data not found" });
+      return res.status(200).json({ message: "Data not found" });
     }
   } catch (error) {
     console.log(error.message);
@@ -168,24 +177,28 @@ const ViewProfile = async (req, res) => {
 
 const EditProfile = async (req, res) => {
   try {
-    console.log("enter edit")
-    const { userId, name, email, mobile } = req.body;
-    const editUser = await User.updateOne(
-      { _id: userId },
+    console.log("enterrrrr edit",req.headers.userId)
+    const userId=req.headers.userId
+    const { name, mobile } = req.body;
+    console.log(req.body)
+    console.log();
+    const editUser = await User.findByIdAndUpdate(
+      userId,
       {
         $set: {
           name: name,
-          email: email,
           mobile: mobile,
         },
       }
     );
+    console.log(editUser);
     if (editUser) {
+      console.log('edit');
       return res
         .status(200)
         .json({ data: editUser, message: "Profile edited successfully" });
     } else {
-      return res.status(200).json({ message: "Failed to edit profil" });
+      return res.status(400).json({ message: "Failed to edit profil" });
     }
   } catch (error) {
     console.log(error);
@@ -312,13 +325,11 @@ const SendMail = async (name, email, id, purpose, token) => {
         console.log("Email send successfully");
       }
     });
-  } catch (error) {}
+  } catch (error) { }
 };
 
 const UserOtpVerify = async (req, res) => {
   try {
-    console.log("monusee");
-    console.log(req.body);
     const { otp, id } = req.body;
     console.log(id, otp);
     const userData = await User.findOne({ _id: id });
@@ -334,7 +345,7 @@ const UserOtpVerify = async (req, res) => {
     } else {
       res.status(400).json({ message: "Otp is incorrect" });
     }
-  } catch (error) {}
+  } catch (error) { }
 };
 
 const SentForgotPasswordMail = async (req, res) => {
@@ -401,7 +412,7 @@ const PassOtpVerify = async (req, res) => {
     } else {
       return res.status(400).json({ message: "OTP is incorrect" });
     }
-  } catch (error) {}
+  } catch (error) { }
 };
 
 module.exports = {

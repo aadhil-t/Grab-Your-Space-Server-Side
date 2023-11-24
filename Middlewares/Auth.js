@@ -6,10 +6,8 @@ dotenv.config();
  
  const userAuth = async(req,res,next)=>{
     try {
-        console.log(req.headers,"ddddddd")
         if(req.headers.authorization){
             let token = req.headers.authorization.split(" ")[1];
-            console.log(token,"tokeeeen");
             const decode = jwt.verify(token,process.env.UserSecret);
             const user = await User.findOne({
                 _id:decode.userId
