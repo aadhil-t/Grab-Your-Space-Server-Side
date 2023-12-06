@@ -24,7 +24,12 @@ const HubAdminSchema = new mongoose.Schema({
     is_verified:{
         type:Boolean,
         default:false,
-    }    
+    },
+
+    is_blocked:{
+        type:Boolean,
+        default:false,
+    }
 })
 
 const hubadmin = mongoose.model('hubadmin',HubAdminSchema)

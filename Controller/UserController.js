@@ -35,7 +35,7 @@ const UserSignin = async (req, res) => {
 
       if (userData) {
         console.log("munessssss");
-        SendMail(
+        SendMail( 
           userData.name,
           userData.email,
           userData._id,
@@ -160,15 +160,15 @@ const userLogin = async (req, res) => {
 
 const ViewProfile = async (req, res) => {
   try {
-
-
+     
     const id = req.headers.userId;
-    console.log(id)
+    console.log(id,'issssssssss working')
     const data = await User.findById(id);
     if (data) {
-      return res.status(200).json({ data: data });
+      console.log(data);
+      return res.status(200).json({ profile: data,message:"success" });
     } else {
-      return res.status(200).json({ message: "Data not found" });
+      return res.status(400).json({ message: "Data not found" });
     }
   } catch (error) {
     console.log(error.message);
@@ -180,7 +180,7 @@ const EditProfile = async (req, res) => {
     console.log("enterrrrr edit",req.headers.userId)
     const userId=req.headers.userId
     const { name, mobile } = req.body;
-    console.log(req.body)
+    console.log(req.body)   
     console.log();
     const editUser = await User.findByIdAndUpdate(
       userId,

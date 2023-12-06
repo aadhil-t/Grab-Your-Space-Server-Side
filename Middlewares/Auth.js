@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../Models/UserModel");
+const Hubadmin = require("../Models/HubAdminModel")
 const dotenv = require("dotenv");
 
 dotenv.config();
@@ -60,8 +61,39 @@ dotenv.config();
 //     }
 // }
 
+
+const hubadminAuth = async(req,res,next)=>{
+    try {
+        if(req.headers.authorization){
+            const Hubtoken = req.headers.authorization.split(" ")[1];
+            const decode = jwt.verify(Hubtoken,process.env.HubAdminSecret);
+            const HubAdmin = await Hubadmin.findOne({
+                _id: decode.userId
+            })
+
+            if(HubAdmin){
+                if(HubAdmin.is_blocked == false){
+                    req.body.userId = decode.userId;
+                    console.log(req.headers);
+                    next()
+                }else{
+                    return res.status(400).json({message:"Your Account has been blocked by Admin"});
+                }
+            }else{
+                return res.status(400).json({message:"User not autherised or invalid user"})
+            }
+
+        }else{
+            return res.status(400).json({message:"User not Autherised"})
+        }
+        
+    } catch (error) {
+        
+    }
+}
 module.exports={
     userAuth,
     // adminAuth
+    hubadminAuth
 
 }
