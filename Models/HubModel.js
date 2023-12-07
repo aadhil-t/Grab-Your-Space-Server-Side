@@ -1,6 +1,14 @@
 const mongoose = require("mongoose")
+const { Schema } = mongoose;
 
-const HubSchema = new Schema({
+const HubSchema = new Schema({  
+
+    hubadminId: {
+        type: Schema.Types.ObjectId,
+        ref: "hubadmin", // Replace with the actual model name you are referencing
+        required: true,
+    },
+
 
     hubname:{
         type:String,

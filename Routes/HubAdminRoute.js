@@ -7,4 +7,5 @@ hubadminRoute.get("/verifyemail/:id/:token",HubAdminController.VerifyEmail)
 hubadminRoute.post("/login",HubAdminController.HubAdminLogin)
 hubadminRoute.get("/profile",Auth.hubadminAuth,HubAdminController.HubProfile)
 hubadminRoute.post('/editprofile',Auth.hubadminAuth,HubAdminController.EditHubProfile)
+hubadminRoute.post('/createhub',Auth.hubadminAuth,HubAdminController.HubCreate)
 module.exports = hubadminRoute

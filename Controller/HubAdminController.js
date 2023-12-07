@@ -1,4 +1,5 @@
 const HubAdmin = require('../Models/HubAdminModel')
+const HubModel = require("../Models/HubModel")
 const mailToken = require('../Models/TokenModel')
 const nodemailer = require('nodemailer')
 const jwt = require('jsonwebtoken')
@@ -212,6 +213,32 @@ const EditHubProfile = async(req,res)=>{
         console.log(error);
     }
 }
+
+
+const HubCreate = async(req,res)=>{
+    try {
+        const HubAdminId = req.body.userId;
+        const {name,email,mobile,location,seatcount} = req.body
+        console.log( req.body,"enter in Hubcreate backend");
+
+        const Hubs = new HubModel({
+
+            hubadminId: HubAdminId,
+           hubname: name,
+            hubemail: email,
+            hubmobile: mobile,
+           hublocation: location,
+            seatcount,
+        })
+
+        const HubData = await Hubs.save();
+       return res.status(200).json({message:"Hub Added successfully"})
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 module.exports={
     HubAdminSingup,
     SendMailer,
@@ -219,4 +246,5 @@ module.exports={
     HubAdminLogin,
     HubProfile,
     EditHubProfile,
+    HubCreate,
 }
