@@ -2,6 +2,7 @@ const User = require("../Models/UserModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
+const HubModel = require('../Models/HubModel')
 const randomstring = require("randomstring");
 require("dotenv").config();
 
@@ -415,6 +416,20 @@ const PassOtpVerify = async (req, res) => {
   } catch (error) { }
 };
 
+
+const HubListing = async(req,res) =>{
+  try {
+    console.log("enter to user backend")
+    console.log(req.body)
+    let HubData = await HubModel.find({hublist:req.body}).populate('hubadminId')
+    if(HubData){
+      res.status(200).json(HubData)
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 module.exports = {
   UserSignin,
   userLogin,
@@ -427,4 +442,5 @@ module.exports = {
   SentForgotPasswordMail,
   ChangePassword,
   PassOtpVerify,
+  HubListing
 };

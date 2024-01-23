@@ -143,9 +143,7 @@ const HubAdminLogin = async(req,res)=>{
     try {
         const {email,password} = req.body;
         const emailExist = await HubAdmin.findOne({email:email});
-        console.log(emailExist,'issssssss');
         if(!emailExist){
-            console.log("enter login");
             return res.status(400).json({message:" Email is invalid "})
         }else{
             const passMatch = await bcrypt.compare(password, emailExist.password);
@@ -174,10 +172,7 @@ const HubAdminLogin = async(req,res)=>{
 
 const HubProfile = async(req,res)=>{
     try {
-        console.log("object");
-        console.log(req.body.userId,"");
         const HubAdminId = await HubAdmin.findById({_id: req.body.userId});
-        console.log(HubAdminId,"nndddbdbdbd");
         if(HubAdminId){
             return res.status(200).json({ profile: HubAdminId, message:"Success"})
         }else{
@@ -192,10 +187,8 @@ const HubProfile = async(req,res)=>{
 
 const EditHubProfile = async(req,res)=>{
     try {
-        console.log(req.body.userId,"heasders");
         const HubAdminId = req.body.userId
         const {name,mobile} = req.body
-        console.log(name,mobile,"name and mobile reached");
         const HubData = await HubAdmin.findByIdAndUpdate(
             { _id : HubAdminId },
             {$set:{
@@ -219,7 +212,6 @@ const HubCreate = async(req,res)=>{
     try {
         const HubAdminId = req.body.userId;
         const {name,email,mobile,location,seatcount} = req.body
-        console.log( req.body,"enter in Hubcreate backend");
 
         const Hubs = new HubModel({
 
@@ -239,6 +231,18 @@ const HubCreate = async(req,res)=>{
     }
 }
 
+
+const HubDataList = async(req,res)=>{
+    try {
+        let hubData = await HubModel.find({hubadminId:req.body.userId}).populate('hubadminId')
+        if(hubData){
+            res.status(200).json(hubData)
+        }
+    } catch (error) {
+        
+    }
+}
+
 module.exports={
     HubAdminSingup,
     SendMailer,
@@ -247,4 +251,5 @@ module.exports={
     HubProfile,
     EditHubProfile,
     HubCreate,
+    HubDataList,
 }

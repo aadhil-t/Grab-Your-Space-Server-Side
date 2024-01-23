@@ -40,9 +40,7 @@ const AdminLogin = async(req,res)=>{
 
 const ViewUserList = async(req,res)=>{
     try {
-        console.log("kkkk")
         const UserDetails = await User.find({is_admin:false})
-        console.log(UserDetails,"hahaha")
         res.json({UserData:UserDetails})
     } catch (error) {
         console.log(error)

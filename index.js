@@ -32,4 +32,4 @@ app.use('/admin',adminRoute)
 app.use('/hub',hubadminRoute)
 app.listen(process.env.Port,()=>{
     console.log(`Server is Running at ${process.env.Port}`);
-})
+})  

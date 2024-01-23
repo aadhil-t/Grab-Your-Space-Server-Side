@@ -7,16 +7,18 @@ dotenv.config();
  
  const userAuth = async(req,res,next)=>{
     try {
-        if(req.headers.authorization){
-            let token = req.headers.authorization.split(" ")[1];
+        console.log(req.headers.Authorization);
+        if(req.headers.Authorization){
+            let token = req.headers.Authorization.split(" ")[1];
+            console.log(token,"token")
             const decode = jwt.verify(token,process.env.UserSecret);
             const user = await User.findOne({
                 _id:decode.userId
             });
-            
+            console.log(user,"user")
             if(user){
                 if(user.is_blocked == false){
-                    req.headers.userId = decode.userId
+                    req.body.userId = decode.userId
                     next()
                 }
                 else{
