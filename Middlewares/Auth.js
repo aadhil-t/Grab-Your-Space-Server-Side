@@ -6,11 +6,10 @@ const dotenv = require("dotenv");
 dotenv.config();
  
  const userAuth = async(req,res,next)=>{
+     console.log(req.headers,"user headersss");
     try {
-        console.log(req.headers.Authorization);
-        if(req.headers.Authorization){
-            let token = req.headers.Authorization.split(" ")[1];
-            console.log(token,"token")
+        if(req.headers.authorization){ 
+            let token = req.headers.authorization.split(" ")[1];
             const decode = jwt.verify(token,process.env.UserSecret);
             const user = await User.findOne({
                 _id:decode.userId
@@ -76,7 +75,7 @@ const hubadminAuth = async(req,res,next)=>{
             if(HubAdmin){
                 if(HubAdmin.is_blocked == false){
                     req.body.userId = decode.userId;
-                    console.log(req.headers);
+                    
                     next()
                 }else{
                     return res.status(400).json({message:"Your Account has been blocked by Admin"});

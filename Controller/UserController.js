@@ -17,7 +17,6 @@ const securePassword = async (password) => {
 
 const UserSignin = async (req, res) => {
   try {
-    console.log("innnnnn")
     const { name, email, mobile, password } = req.body;
     const Spassword = await securePassword(password);
     const emailExist = await User.findOne({ email: email });
@@ -35,7 +34,6 @@ const UserSignin = async (req, res) => {
       const userData = await user.save();
 
       if (userData) {
-        console.log("munessssss");
         SendMail( 
           userData.name,
           userData.email,
@@ -85,9 +83,8 @@ const UserSignin = async (req, res) => {
 
 const userLogin = async (req, res) => {
   try {
-    console.log("login");
     const { email, password, id } = req.body;
-    console.log(req.body, "hhhhhhhhhhhhhhhhhhhh");
+
     if (id) {
       const exist = await User.findOne({ password: id });
       console.log(exist, "anas");
@@ -139,7 +136,6 @@ const userLogin = async (req, res) => {
                 process.env.UserSecret,
                 { expiresIn: "1h" }
               );
-              console.log(token);
               return res
                 .status(200)
                 .json({
@@ -162,7 +158,7 @@ const userLogin = async (req, res) => {
 const ViewProfile = async (req, res) => {
   try {
      
-    const id = req.headers.userId;
+    const id = req.body.userId;
     console.log(id,'issssssssss working')
     const data = await User.findById(id);
     if (data) {
@@ -178,8 +174,8 @@ const ViewProfile = async (req, res) => {
 
 const EditProfile = async (req, res) => {
   try {
-    console.log("enterrrrr edit",req.headers.userId)
-    const userId=req.headers.userId
+    console.log("enterrrrr edit",req.body.userId)
+    const userId=req.body.userId
     const { name, mobile } = req.body;
     console.log(req.body)   
     console.log();
@@ -332,12 +328,9 @@ const SendMail = async (name, email, id, purpose, token) => {
 const UserOtpVerify = async (req, res) => {
   try {
     const { otp, id } = req.body;
-    console.log(id, otp);
     const userData = await User.findOne({ _id: id });
-    console.log(userData);
 
     if (otp == userData.otp) {
-      console.log("enter");
       await User.updateOne({ _id: id }, { is_verified: true, otp: "" });
       const token = jwt.sign({ userId: userData._id }, process.env.UserSecret, {
         expiresIn: "1h",
@@ -375,7 +368,6 @@ const SentForgotPasswordMail = async (req, res) => {
 const ChangePassword = async (req, res) => {
   try {
     const { password, id, token } = req.body;
-    console.log(req.body);
     const pass = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(password, pass);
 
@@ -402,12 +394,7 @@ const ChangePassword = async (req, res) => {
 const PassOtpVerify = async (req, res) => {
   try {
     const { otp, id } = req.body;
-    console.log(otp, id);
-    console.log(req.body);
-
     const userData = await User.findOne({ _id: id });
-    console.log(userData.otp);
-
     if (otp == userData.otp) {
       return res.status(200).json({ message: "OTP is valid" });
     } else {
@@ -419,12 +406,24 @@ const PassOtpVerify = async (req, res) => {
 
 const HubListing = async(req,res) =>{
   try {
-    console.log("enter to user backend")
-    console.log(req.body)
-    let HubData = await HubModel.find({hublist:req.body}).populate('hubadminId')
+    let HubData = await HubModel.find()
     if(HubData){
-      res.status(200).json(HubData)
+      res.status(200).json(HubData) 
     }
+  } catch (error) {
+    console.log(error)
+  }
+};
+
+const SingleHub = async(req,res)=>{
+  try {
+    const objid = req.params.objId
+    console.log(req.params,"iiiiiiiiipppppppppppp")
+    const singleData = await HubModel.findById(objid )
+     if(singleData){
+      res.status(200).json(singleData)
+     }
+    console.log(singleData)
   } catch (error) {
     console.log(error)
   }
@@ -442,5 +441,6 @@ module.exports = {
   SentForgotPasswordMail,
   ChangePassword,
   PassOtpVerify,
-  HubListing
+  HubListing,
+  SingleHub,
 };

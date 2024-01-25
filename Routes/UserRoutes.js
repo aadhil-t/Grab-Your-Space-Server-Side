@@ -17,4 +17,5 @@ router.post('/forgotmail',userController.SentForgotPasswordMail);
 router.post('/changepass',userController.ChangePassword);
 router.post('/passotverify',userController.PassOtpVerify);
 router.get('/hublisting',Auth.userAuth,userController.HubListing)
+router.get('/singlehub/:objId',Auth.userAuth,userController.SingleHub)
 module.exports = router 
