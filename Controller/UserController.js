@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const HubModel = require('../Models/HubModel')
+const Booking = require('../Models/BookingModel')
 const randomstring = require("randomstring");
 require("dotenv").config();
 
@@ -429,6 +430,44 @@ const SingleHub = async(req,res)=>{
   }
 }
 
+
+const StoreBookedData = async(req,res)=>{
+  try {
+    console.log(req.body,"enter in backend booking ");
+    const {userId, selectedDate, selected, singleHubData } = req.body;
+    console.log(userId)
+    const booked = new Booking({
+      bookeduserid : userId,
+     bookedhubid: singleHubData,
+      date: selectedDate,
+      selectedseats: selected,
+    })
+    const bookedData = await booked.save()
+    if(bookedData){
+      res.status(200).json(bookedData);
+    }
+    else{
+      return res.status(400).json({message:"Can't book Something went wrong!!"})
+    }
+    console.log(bookedData,"successfully booked")
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
+const BookedData = async(req,res)=>{
+  try {
+    console.log("entered in backend bookedData")
+    const data = await Booking.findOne()
+    console.log(data);
+    // const data = await findOne({})
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
 module.exports = {
   UserSignin,
   userLogin,
@@ -443,4 +482,6 @@ module.exports = {
   PassOtpVerify,
   HubListing,
   SingleHub,
+  StoreBookedData,
+  BookedData,
 };

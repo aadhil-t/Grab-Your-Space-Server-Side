@@ -18,4 +18,7 @@ router.post('/changepass',userController.ChangePassword);
 router.post('/passotverify',userController.PassOtpVerify);
 router.get('/hublisting',Auth.userAuth,userController.HubListing)
 router.get('/singlehub/:objId',Auth.userAuth,userController.SingleHub)
+router.post('/booking',Auth.userAuth,userController.StoreBookedData)
+router.get('/bookeddetails',Auth.userAuth,userController.BookedData)
+
 module.exports = router 
