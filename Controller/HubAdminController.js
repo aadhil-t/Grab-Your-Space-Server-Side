@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
 const bcrypt = require('bcrypt');
 const { SendMail } = require('./UserController');
-const { info } = require('console')
+// const { info } = require('console')
 const { clearScreenDown } = require('readline')
 
 
@@ -211,7 +211,7 @@ const EditHubProfile = async(req,res)=>{
 const HubCreate = async(req,res)=>{
     try {
         const HubAdminId = req.body.userId;
-        const {name,email,mobile,location,seatcount} = req.body
+        const {name,email,mobile,location,seatcount,price} = req.body
 
         const Hubs = new HubModel({
 
@@ -221,9 +221,11 @@ const HubCreate = async(req,res)=>{
             hubmobile: mobile,
            hublocation: location,
             seatcount,
+            price: price,
         })
 
         const HubData = await Hubs.save();
+        console.log(HubData,"fffffffff")
        return res.status(200).json({message:"Hub Added successfully"})
 
     } catch (error) {

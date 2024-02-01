@@ -35,6 +35,10 @@ const HubSchema = new Schema({
         required:true
     },
 
+    price:{
+        type:Number,
+        required:true
+    },
 })
 
 const Hub = mongoose.model("Hub",HubSchema);

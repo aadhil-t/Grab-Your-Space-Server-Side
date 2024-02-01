@@ -5,6 +5,8 @@ const nodemailer = require("nodemailer");
 const HubModel = require('../Models/HubModel')
 const Booking = require('../Models/BookingModel')
 const randomstring = require("randomstring");
+const Stripe = require('stripe');
+const booked = require("../Models/BookingModel");
 require("dotenv").config();
 
 const securePassword = async (password) => {
@@ -101,7 +103,7 @@ const userLogin = async (req, res) => {
         }
         else{
           const token = jwt.sign({ userId: exist.id }, process.env.UserSecret, {
-            expiresIn: "1h",
+            expiresIn: "4h",
           });
           console.log(token);
           return res
@@ -135,7 +137,7 @@ const userLogin = async (req, res) => {
               const token = jwt.sign(
                 { userId: emailExist.id },
                 process.env.UserSecret,
-                { expiresIn: "1h" }
+                { expiresIn: "4h" }
               );
               return res
                 .status(200)
@@ -175,7 +177,6 @@ const ViewProfile = async (req, res) => {
 
 const EditProfile = async (req, res) => {
   try {
-    console.log("enterrrrr edit",req.body.userId)
     const userId=req.body.userId
     const { name, mobile } = req.body;
     console.log(req.body)   
@@ -208,7 +209,6 @@ const UpdateEdit = async (req, res) => {
     const { name, email } = req.body;
 
     const userId = req.body.id;
-    console.log(userId);
     let userData = await User.findOneAndUpdate(
       { _id: userId },
       { $set: { name: name, email: email } },
@@ -231,7 +231,6 @@ const UpdateEdit = async (req, res) => {
 
 const SignupWithGoogle = async (req, res) => {
   try {
-    console.log(req.body, "nnnnnnnnnn");
     const { name, email, id } = req.body;
     console.log(name, email, id);
     const exist = await User.findOne({ email: email });
@@ -381,7 +380,6 @@ const ChangePassword = async (req, res) => {
       { _id: id },
       { $set: { password: hashPassword } }
     );
-    console.log(userData, "userdata");
     if (userData) {
       res.status(200).json({ message: "Password successfully changed" });
     } else {
@@ -434,20 +432,21 @@ const SingleHub = async(req,res)=>{
 const StoreBookedData = async(req,res)=>{
   try {
     console.log(req.body,"enter in backend booking ");
-    const {userId, selectedDate, selected, singleHubData } = req.body;
-    console.log(userId)
+    const {userId, selectedDate, selected, singleHubData,newTotalAmount } = req.body;
     const booked = new Booking({
       bookeduserid : userId,
      bookedhubid: singleHubData,
       date: selectedDate,
       selectedseats: selected,
+      totalamount: newTotalAmount,
+
     })
     const bookedData = await booked.save()
     if(bookedData){
-      res.status(200).json(bookedData);
+      res.status(200).json({booked :true ,data : bookedData});
     }
     else{
-      return res.status(400).json({message:"Can't book Something went wrong!!"})
+      return res.status(400).json({booked :false , message:"Can't book Something went wrong!!"})
     }
     console.log(bookedData,"successfully booked")
   } catch (error) {
@@ -456,12 +455,34 @@ const StoreBookedData = async(req,res)=>{
 }
 
 
-const BookedData = async(req,res)=>{
+const BookedData = async (req, res) => {
   try {
-    console.log("entered in backend bookedData")
-    const data = await Booking.findOne()
-    console.log(data);
-    // const data = await findOne({})
+    const bookedId = req.params.bookedId; 
+    console.log(bookedId, "entered in backend bookedData");
+    const data = await Booking.find({_id:bookedId}).populate('bookedhubid').populate('bookeduserid')
+    const stripe = new Stripe('sk_test_51O11IzSJfBiixPMTuMIQ5XnJMHD2niq1bWmFC9qjOQ11GIMxsADIsMfJ4azYq8PKqCKkp5KEmFkLzaZsmdoguEZl00WG2wrBwR')
+    const amount = data[0].totalamount
+    const paymentintent = await stripe.paymentIntents.create({
+      amount: amount*100,
+      currency:"inr",
+      automatic_payment_methods: {enabled: true},
+    })
+    console.log(paymentintent,"intent")
+    res.status(200).json({data, clientSecret : paymentintent.client_secret});
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
+const UpdateStatus = async(req,res)=>{
+  try {
+    console.log("enter into UpdateStatus")
+    const update = await booked.updateOne({_id:req.body.id},{$set:{paymentstatus:'success'}})
+    console.log(update)
+    res.status(200).json({ update ,message:"update succeessfully"})
   } catch (error) {
     console.log(error)
   }
@@ -484,4 +505,5 @@ module.exports = {
   SingleHub,
   StoreBookedData,
   BookedData,
+  UpdateStatus,
 };

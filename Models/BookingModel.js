@@ -24,7 +24,18 @@ const BookingSchema = new mongoose.Schema({
      date:{
         type: Date,
         required: true,
-     }
+     },
+
+     totalamount:{
+        type: Number,
+        
+     },
+
+     paymentstatus:{
+        type:String,
+        default:"pending",
+    },
+
 
 })
 

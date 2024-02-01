@@ -6,7 +6,7 @@ const dotenv = require("dotenv");
 dotenv.config();
  
  const userAuth = async(req,res,next)=>{
-     console.log(req.headers,"user headersss");
+     
     try {
         if(req.headers.authorization){ 
             let token = req.headers.authorization.split(" ")[1];

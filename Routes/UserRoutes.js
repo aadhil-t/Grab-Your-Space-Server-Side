@@ -19,6 +19,7 @@ router.post('/passotverify',userController.PassOtpVerify);
 router.get('/hublisting',Auth.userAuth,userController.HubListing)
 router.get('/singlehub/:objId',Auth.userAuth,userController.SingleHub)
 router.post('/booking',Auth.userAuth,userController.StoreBookedData)
-router.get('/bookeddetails',Auth.userAuth,userController.BookedData)
+router.get('/bookeddetails/:bookedId',Auth.userAuth,userController.BookedData)
+router.put("/updatepaystatus",Auth.userAuth,userController.UpdateStatus)
 
 module.exports = router 
