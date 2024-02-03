@@ -488,6 +488,20 @@ const UpdateStatus = async(req,res)=>{
   }
 }
 
+const BookedHistory = async(req,res)=>{
+  try {
+    console.log("reached backend BookedHistory")
+    const userId = req.body.userId
+    const data= await booked.find({bookeduserid:userId}).populate("bookedhubid").populate("bookeduserid")
+    if(data){
+      res.status(200).json({data,message:"successfull"})
+    }else{
+      res.status(400).json({message:"something went wrong !"})
+    }
+  } catch (error) {
+    console.log(error)    
+  }
+} 
 
 module.exports = {
   UserSignin,
@@ -506,4 +520,5 @@ module.exports = {
   StoreBookedData,
   BookedData,
   UpdateStatus,
+  BookedHistory,
 };

@@ -21,5 +21,6 @@ router.get('/singlehub/:objId',Auth.userAuth,userController.SingleHub)
 router.post('/booking',Auth.userAuth,userController.StoreBookedData)
 router.get('/bookeddetails/:bookedId',Auth.userAuth,userController.BookedData)
 router.put("/updatepaystatus",Auth.userAuth,userController.UpdateStatus)
+router.get("/bookedhistory",Auth.userAuth,userController.BookedHistory)
 
 module.exports = router 
