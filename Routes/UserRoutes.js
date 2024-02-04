@@ -22,5 +22,7 @@ router.post('/booking',Auth.userAuth,userController.StoreBookedData)
 router.get('/bookeddetails/:bookedId',Auth.userAuth,userController.BookedData)
 router.put("/updatepaystatus",Auth.userAuth,userController.UpdateStatus)
 router.get("/bookedhistory",Auth.userAuth,userController.BookedHistory)
+router.post("/changepropass",Auth.userAuth,userController.ChangeProfilePassword)
+router.post("/setnewpass",Auth.userAuth,userController.SetNewPassword)
 
 module.exports = router 

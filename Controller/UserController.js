@@ -2,10 +2,10 @@ const User = require("../Models/UserModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
-const HubModel = require('../Models/HubModel')
-const Booking = require('../Models/BookingModel')
+const HubModel = require("../Models/HubModel");
+const Booking = require("../Models/BookingModel");
 const randomstring = require("randomstring");
-const Stripe = require('stripe');
+const Stripe = require("stripe");
 const booked = require("../Models/BookingModel");
 require("dotenv").config();
 
@@ -37,7 +37,7 @@ const UserSignin = async (req, res) => {
       const userData = await user.save();
 
       if (userData) {
-        SendMail( 
+        SendMail(
           userData.name,
           userData.email,
           userData._id,
@@ -96,12 +96,11 @@ const userLogin = async (req, res) => {
           .status(400)
           .json({ message: "You don't have Account please sign up" });
       } else {
-        if(exist.is_blocked == true){
+        if (exist.is_blocked == true) {
           return res
-          .status(400)
-          .json({ message: "Your Account is blocked by admin" });
-        }
-        else{
+            .status(400)
+            .json({ message: "Your Account is blocked by admin" });
+        } else {
           const token = jwt.sign({ userId: exist.id }, process.env.UserSecret, {
             expiresIn: "4h",
           });
@@ -118,7 +117,7 @@ const userLogin = async (req, res) => {
       } else {
         const access = await bcrypt.compare(password, emailExist.password);
         if (!access) {
-          return res  
+          return res
             .status(400)
             .json({ message: "Entered password is incorrect" });
         } else {
@@ -128,26 +127,22 @@ const userLogin = async (req, res) => {
               .json({ message: "Your Account is blocked by admin" });
           } else {
             if (!emailExist.is_verified) {
-              return res
-                .status(400)
-                .json({
-                  message: "Your Account is not verified please sign up",
-                });
+              return res.status(400).json({
+                message: "Your Account is not verified please sign up",
+              });
             } else {
               const token = jwt.sign(
                 { userId: emailExist.id },
                 process.env.UserSecret,
                 { expiresIn: "4h" }
               );
-              return res
-                .status(200)
-                .json({
-                  created: true,
-                  userData: emailExist,
-                  status: true,
-                  token,
-                  message: "Successfully log in",
-                });
+              return res.status(200).json({
+                created: true,
+                userData: emailExist,
+                status: true,
+                token,
+                message: "Successfully log in",
+              });
             }
           }
         }
@@ -160,13 +155,12 @@ const userLogin = async (req, res) => {
 
 const ViewProfile = async (req, res) => {
   try {
-     
     const id = req.body.userId;
-    console.log(id,'issssssssss working')
+    console.log(id, "issssssssss working");
     const data = await User.findById(id);
     if (data) {
       console.log(data);
-      return res.status(200).json({ profile: data,message:"success" });
+      return res.status(200).json({ profile: data, message: "success" });
     } else {
       return res.status(400).json({ message: "Data not found" });
     }
@@ -177,22 +171,19 @@ const ViewProfile = async (req, res) => {
 
 const EditProfile = async (req, res) => {
   try {
-    const userId=req.body.userId
+    const userId = req.body.userId;
     const { name, mobile } = req.body;
-    console.log(req.body)   
+    console.log(req.body);
     console.log();
-    const editUser = await User.findByIdAndUpdate(
-      userId,
-      {
-        $set: {
-          name: name,
-          mobile: mobile,
-        },
-      }
-    );
+    const editUser = await User.findByIdAndUpdate(userId, {
+      $set: {
+        name: name,
+        mobile: mobile,
+      },
+    });
     console.log(editUser);
     if (editUser) {
-      console.log('edit');
+      console.log("edit");
       return res
         .status(200)
         .json({ data: editUser, message: "Profile edited successfully" });
@@ -215,13 +206,11 @@ const UpdateEdit = async (req, res) => {
       { new: true }
     );
     if (userData) {
-      return res
-        .status(200)
-        .json({
-          updated: true,
-          data: userData,
-          message: "updated successfully",
-        });
+      return res.status(200).json({
+        updated: true,
+        data: userData,
+        message: "updated successfully",
+      });
     }
     res.status(404).json({ updated: false, message: "Failed update" });
   } catch (error) {
@@ -249,14 +238,12 @@ const SignupWithGoogle = async (req, res) => {
       const token = jwt.sign({ userId: user._id }, process.env.UserSecret, {
         expiresIn: "24hr",
       });
-      return res
-        .status(200)
-        .json({
-          created: true,
-          token: token,
-          user,
-          message: "Account registered",
-        });
+      return res.status(200).json({
+        created: true,
+        token: token,
+        user,
+        message: "Account registered",
+      });
     }
   } catch (error) {
     console.log(error);
@@ -285,7 +272,16 @@ const SendMail = async (name, email, id, purpose, token) => {
                  <p>Thank you for signing up with Grab Your Space. your otp is ${otp}</p>
             </body>
             </html>`;
-    } else {
+    } else if(purpose === "forgot password"){
+      content = `<html>
+                <body>
+                      <h1>Grab Your Space Forgot Password Verfication</h1>
+                      <img src="https://img.freepik.com/premium-vector/cyber-security-illustration-concept-with-characters-data-security-protected-access-control-privacy-data-protection_269730-48.jpg?size=626&ext=jpg&ga=GA1.1.1978292054.1686055633&semt=sph" width="500" height="500">
+                      <p>Hi ${name},</p>
+                      <p>Thank you for signing up with Grab Your Space. your otp is ${otp}</p>
+                </body>
+            </html>`;
+    }else{
       content = `<html>
                 <body>
                       <h1>Grab Your Space Forgot Password Verfication</h1>
@@ -322,8 +318,9 @@ const SendMail = async (name, email, id, purpose, token) => {
         console.log("Email send successfully");
       }
     });
-  } catch (error) { }
+  } catch (error) {}
 };
+  
 
 const UserOtpVerify = async (req, res) => {
   try {
@@ -339,7 +336,7 @@ const UserOtpVerify = async (req, res) => {
     } else {
       res.status(400).json({ message: "Otp is incorrect" });
     }
-  } catch (error) { }
+  } catch (error) {}
 };
 
 const SentForgotPasswordMail = async (req, res) => {
@@ -399,109 +396,179 @@ const PassOtpVerify = async (req, res) => {
     } else {
       return res.status(400).json({ message: "OTP is incorrect" });
     }
-  } catch (error) { }
+  } catch (error) {}
 };
 
-
-const HubListing = async(req,res) =>{
+const HubListing = async (req, res) => {
   try {
-    let HubData = await HubModel.find()
-    if(HubData){
-      res.status(200).json(HubData) 
+    let HubData = await HubModel.find();
+    if (HubData) {
+      res.status(200).json(HubData);
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 };
 
-const SingleHub = async(req,res)=>{
+const SingleHub = async (req, res) => {
   try {
-    const objid = req.params.objId
-    console.log(req.params,"iiiiiiiiipppppppppppp")
-    const singleData = await HubModel.findById(objid )
-     if(singleData){
-      res.status(200).json(singleData)
-     }
-    console.log(singleData)
+    const objid = req.params.objId;
+    console.log(req.params, "iiiiiiiiipppppppppppp");
+    const singleData = await HubModel.findById(objid);
+    if (singleData) {
+      res.status(200).json(singleData);
+    }
+    console.log(singleData);
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
 
-
-const StoreBookedData = async(req,res)=>{
+const StoreBookedData = async (req, res) => {
   try {
-    console.log(req.body,"enter in backend booking ");
-    const {userId, selectedDate, selected, singleHubData,newTotalAmount } = req.body;
+    console.log(req.body, "enter in backend booking ");
+    const { userId, selectedDate, selected, singleHubData, newTotalAmount } =
+      req.body;
     const booked = new Booking({
-      bookeduserid : userId,
-     bookedhubid: singleHubData,
+      bookeduserid: userId,
+      bookedhubid: singleHubData,
       date: selectedDate,
       selectedseats: selected,
       totalamount: newTotalAmount,
-
-    })
-    const bookedData = await booked.save()
-    if(bookedData){
-      res.status(200).json({booked :true ,data : bookedData});
+    });
+    const bookedData = await booked.save();
+    if (bookedData) {
+      res.status(200).json({ booked: true, data: bookedData });
+    } else {
+      return res
+        .status(400)
+        .json({ booked: false, message: "Can't book Something went wrong!!" });
     }
-    else{
-      return res.status(400).json({booked :false , message:"Can't book Something went wrong!!"})
-    }
-    console.log(bookedData,"successfully booked")
+    console.log(bookedData, "successfully booked");
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
-
+};
 
 const BookedData = async (req, res) => {
   try {
-    const bookedId = req.params.bookedId; 
+    const bookedId = req.params.bookedId;
     console.log(bookedId, "entered in backend bookedData");
-    const data = await Booking.find({_id:bookedId}).populate('bookedhubid').populate('bookeduserid')
-    const stripe = new Stripe('sk_test_51O11IzSJfBiixPMTuMIQ5XnJMHD2niq1bWmFC9qjOQ11GIMxsADIsMfJ4azYq8PKqCKkp5KEmFkLzaZsmdoguEZl00WG2wrBwR')
-    const amount = data[0].totalamount
+    const data = await Booking.find({ _id: bookedId })
+      .populate("bookedhubid")
+      .populate("bookeduserid");
+    const stripe = new Stripe(
+      "sk_test_51O11IzSJfBiixPMTuMIQ5XnJMHD2niq1bWmFC9qjOQ11GIMxsADIsMfJ4azYq8PKqCKkp5KEmFkLzaZsmdoguEZl00WG2wrBwR"
+    );
+    const amount = data[0].totalamount;
     const paymentintent = await stripe.paymentIntents.create({
-      amount: amount*100,
-      currency:"inr",
-      automatic_payment_methods: {enabled: true},
-    })
-    console.log(paymentintent,"intent")
-    res.status(200).json({data, clientSecret : paymentintent.client_secret});
-
+      amount: amount * 100,
+      currency: "inr",
+      automatic_payment_methods: { enabled: true },
+    });
+    console.log(paymentintent, "intent");
+    res.status(200).json({ data, clientSecret: paymentintent.client_secret });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-
-const UpdateStatus = async(req,res)=>{
+const UpdateStatus = async (req, res) => {
   try {
-    console.log("enter into UpdateStatus")
-    const update = await booked.updateOne({_id:req.body.id},{$set:{paymentstatus:'success'}})
-    console.log(update)
-    res.status(200).json({ update ,message:"update succeessfully"})
+    console.log("enter into UpdateStatus");
+    const update = await booked.updateOne(
+      { _id: req.body.id },
+      { $set: { paymentstatus: "success" } }
+    );
+    console.log(update);
+    res.status(200).json({ update, message: "update succeessfully" });
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
 
-const BookedHistory = async(req,res)=>{
+const BookedHistory = async (req, res) => {
   try {
-    console.log("reached backend BookedHistory")
-    const userId = req.body.userId
-    const data= await booked.find({bookeduserid:userId}).populate("bookedhubid").populate("bookeduserid")
-    if(data){
-      res.status(200).json({data,message:"successfull"})
-    }else{
-      res.status(400).json({message:"something went wrong !"})
+    console.log("reached backend BookedHistory");
+    const userId = req.body.userId;
+    const data = await booked
+      .find({ bookeduserid: userId })
+      .populate("bookedhubid")
+      .populate("bookeduserid");
+    if (data) {
+      res.status(200).json({ data, message: "successfull" });
+    } else {
+      res.status(400).json({ message: "something went wrong !" });
     }
   } catch (error) {
-    console.log(error)    
+    console.log(error);
   }
-} 
+};
+
+const ChangeProfilePassword = async (req, res) => {
+  try {
+    const userData = await User.findById(req.body.userId);
+    const compare = await bcrypt.compare(
+      req.body.changepassword,
+      userData.password
+    );
+    if (compare) {
+      res.status(200).json({ compare, message: "successfull" });
+    } else {
+      res.status(400).json({ message: "Something Went Wrong !" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const SetNewPassword = async (req, res) => {
+  try {
+    console.log("reached SetNewPassword backendaaaaaa ");
+    const pass = req.body.ConfirmPassword;
+    const hashnewpass = await bcrypt.hash(pass,10)
+    console.log(hashnewpass)
+    const userData = await User.findById(req.body.userId);
+    console.log(userData.password)
+    const access = await bcrypt.compare(pass,userData.password);
+    
+    console.log(access);
+    if (!access) {
+      const userData = await User.updateOne(
+        { _id: req.body.userId },
+        { $set: { password: hashnewpass } }
+      );
+      res.status(200).json({message:"successfully updated"})
+      console.log(userData)
+    } else {
+      res.status(400).json({userData,message: "Wrong !!" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+
+
+
+const ResendUserOtpVerify = async (req, res) => {
+  try {
+    const { otp, id } = req.body;
+    const userData = await User.findOne({ _id: id });
+
+    if (otp == userData.otp) {
+      await User.updateOne({ _id: id }, { is_verified: true, otp: "" });
+      const token = jwt.sign({ userId: userData._id }, process.env.UserSecret, {
+        expiresIn: "1h",
+      });
+      res.json(token);
+    } else {
+      res.status(400).json({ message: "Otp is incorrect" });
+    }
+  } catch (error) {}
+};
 
 module.exports = {
   UserSignin,
@@ -521,4 +588,6 @@ module.exports = {
   BookedData,
   UpdateStatus,
   BookedHistory,
+  ChangeProfilePassword,
+  SetNewPassword,
 };
