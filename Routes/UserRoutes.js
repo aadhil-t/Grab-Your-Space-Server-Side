@@ -24,5 +24,6 @@ router.put("/updatepaystatus",Auth.userAuth,userController.UpdateStatus)
 router.get("/bookedhistory",Auth.userAuth,userController.BookedHistory)
 router.post("/changepropass",Auth.userAuth,userController.ChangeProfilePassword)
 router.post("/setnewpass",Auth.userAuth,userController.SetNewPassword)
+router.post("/resendotp",userController.ResendUserOtpVerify)
 
 module.exports = router 

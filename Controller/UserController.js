@@ -272,7 +272,7 @@ const SendMail = async (name, email, id, purpose, token) => {
                  <p>Thank you for signing up with Grab Your Space. your otp is ${otp}</p>
             </body>
             </html>`;
-    } else if(purpose === "forgot password"){
+    } else if (purpose === "forgot password") {
       content = `<html>
                 <body>
                       <h1>Grab Your Space Forgot Password Verfication</h1>
@@ -281,14 +281,13 @@ const SendMail = async (name, email, id, purpose, token) => {
                       <p>Thank you for signing up with Grab Your Space. your otp is ${otp}</p>
                 </body>
             </html>`;
-    }else{
+    } else {
       content = `<html>
-                <body>
-                      <h1>Grab Your Space Forgot Password Verfication</h1>
-                      <img src="https://img.freepik.com/premium-vector/cyber-security-illustration-concept-with-characters-data-security-protected-access-control-privacy-data-protection_269730-48.jpg?size=626&ext=jpg&ga=GA1.1.1978292054.1686055633&semt=sph" width="500" height="500">
-                      <p>Hi ${name},</p>
-                      <p>Thank you for signing up with Grab Your Space. your otp is ${otp}</p>
-                </body>
+      <body>
+      <h1>Grab Your Space User Verfication</h1>
+      <p>Hi ${name},</p>
+      <p>Thank you for signing up with Grab Your Space. your resended otp is ${otp}</p>
+ </body>
             </html>`;
     }
 
@@ -320,7 +319,6 @@ const SendMail = async (name, email, id, purpose, token) => {
     });
   } catch (error) {}
 };
-  
 
 const UserOtpVerify = async (req, res) => {
   try {
@@ -527,47 +525,48 @@ const SetNewPassword = async (req, res) => {
   try {
     console.log("reached SetNewPassword backendaaaaaa ");
     const pass = req.body.ConfirmPassword;
-    const hashnewpass = await bcrypt.hash(pass,10)
-    console.log(hashnewpass)
+    const hashnewpass = await bcrypt.hash(pass, 10);
+    console.log(hashnewpass);
     const userData = await User.findById(req.body.userId);
-    console.log(userData.password)
-    const access = await bcrypt.compare(pass,userData.password);
-    
+    console.log(userData.password);
+    const access = await bcrypt.compare(pass, userData.password);
+
     console.log(access);
     if (!access) {
       const userData = await User.updateOne(
         { _id: req.body.userId },
         { $set: { password: hashnewpass } }
       );
-      res.status(200).json({message:"successfully updated"})
-      console.log(userData)
+      res.status(200).json({ message: "successfully updated" });
+      console.log(userData);
     } else {
-      res.status(400).json({userData,message: "Wrong !!" });
+      res.status(400).json({ userData, message: "Wrong !!" });
     }
   } catch (error) {
     console.log(error);
   }
 };
 
-
-
-
-
 const ResendUserOtpVerify = async (req, res) => {
   try {
-    const { otp, id } = req.body;
-    const userData = await User.findOne({ _id: id });
-
-    if (otp == userData.otp) {
-      await User.updateOne({ _id: id }, { is_verified: true, otp: "" });
-      const token = jwt.sign({ userId: userData._id }, process.env.UserSecret, {
-        expiresIn: "1h",
-      });
-      res.json(token);
-    } else {
-      res.status(400).json({ message: "Otp is incorrect" });
+    console.log("reached at resent");
+    console.log(req.body.id);
+    const userData = await User.findOne({ _id: req.body.id });
+    console.log(userData);
+    if (userData) {
+      SendMail(
+        userData.name,
+        userData.email,
+        userData._id,
+        "resent otp"
+      );
+      res.status(200).json({userData, message:"Successfully Resent otp"})
+    }else{
+      res.status(400).json({message:"Something Went Wrong On Resent otp"})      
     }
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 module.exports = {
@@ -590,4 +589,5 @@ module.exports = {
   BookedHistory,
   ChangeProfilePassword,
   SetNewPassword,
+  ResendUserOtpVerify,
 };
