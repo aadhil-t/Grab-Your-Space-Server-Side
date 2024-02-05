@@ -286,7 +286,7 @@ const SendMail = async (name, email, id, purpose, token) => {
       <body>
       <h1>Grab Your Space User Verfication</h1>
       <p>Hi ${name},</p>
-      <p>Thank you for signing up with Grab Your Space. your resended otp is ${otp}</p>
+      <p>Thank you for signing up with Grab Your Space. your Resended otp is ${otp}</p>
  </body>
             </html>`;
     }
