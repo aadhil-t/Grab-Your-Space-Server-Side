@@ -1,4 +1,5 @@
 const User = require('../Models/UserModel')
+const HubAdmin = require('../Models/HubAdminModel')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 
@@ -70,9 +71,25 @@ const UserBlock = async(req,res)=>{
    }
 }
 
+const HubAdminListing = async(req,res)=>{
+    try {
+        console.log("Entered in Admin Controller")
+        const data = await HubAdmin.find({})
+        console.log(data)
+        if(data){
+            res.status(200).json({ data, message:"Successfull"})
+        }else{
+            res.status(400).json({message:"Something went wrong"})
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 
 module.exports={
     AdminLogin,
     ViewUserList,
     UserBlock,
+    HubAdminListing,
 }
