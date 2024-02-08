@@ -425,15 +425,16 @@ const SingleHub = async (req, res) => {
 const StoreBookedData = async (req, res) => {
   try {
     console.log(req.body, "enter in backend booking ");
-    const { userId, selectedDate, selected, singleHubData, newTotalAmount } =
-      req.body;
+    const { userId, selectedDate, selected, singleHubData, newTotalAmount} = req.body;
     const booked = new Booking({
       bookeduserid: userId,
       bookedhubid: singleHubData,
+      AdminId: singleHubData.hubadminId,
       date: selectedDate,
       selectedseats: selected,
       totalamount: newTotalAmount,
     });
+    console.log(booked)
     const bookedData = await booked.save();
     if (bookedData) {
       res.status(200).json({ booked: true, data: bookedData });
@@ -442,7 +443,7 @@ const StoreBookedData = async (req, res) => {
         .status(400)
         .json({ booked: false, message: "Can't book Something went wrong!!" });
     }
-    console.log(bookedData, "successfully booked");
+    // console.log(bookedData, "successfully booked");
   } catch (error) {
     console.log(error);
   }

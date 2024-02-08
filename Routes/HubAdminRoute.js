@@ -9,4 +9,5 @@ hubadminRoute.get("/profile",Auth.hubadminAuth,HubAdminController.HubProfile)
 hubadminRoute.post('/editprofile',Auth.hubadminAuth,HubAdminController.EditHubProfile)
 hubadminRoute.post('/createhub',Auth.hubadminAuth,HubAdminController.HubCreate)
 hubadminRoute.get('/hubdata',Auth.hubadminAuth,HubAdminController.HubDataList)
+hubadminRoute.get('/bookedhistory',Auth.hubadminAuth,HubAdminController.BookedHistory)
 module.exports = hubadminRoute

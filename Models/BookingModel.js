@@ -16,6 +16,12 @@ const BookingSchema = new mongoose.Schema({
         required: true,
      },
 
+     AdminId:{
+      type:Schema.Types.ObjectId,
+      ref:"hubadmin",
+      required: true,
+     },
+
      selectedseats:{
         type: Array,
         required: true,

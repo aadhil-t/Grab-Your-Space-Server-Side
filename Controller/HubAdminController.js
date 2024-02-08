@@ -1,5 +1,6 @@
 const HubAdmin = require('../Models/HubAdminModel')
 const HubModel = require("../Models/HubModel")
+const BookingModel = require("../Models/BookingModel")
 const mailToken = require('../Models/TokenModel')
 const nodemailer = require('nodemailer')
 const jwt = require('jsonwebtoken')
@@ -245,6 +246,23 @@ const HubDataList = async(req,res)=>{
     }
 }
 
+
+const BookedHistory = async(req,res)=>{
+    try {
+        console.log("Entered in Bookedhistory backend");
+        console.log(req.body.userId)
+        const data = await BookingModel.find({AdminId:req.body.userId}).populate('bookeduserid').populate('bookedhubid')
+        console.log(data)   
+        if(data){
+            res.status(200).json({ data , message:"successfull"})
+        }else{
+            res.status(200).json({ data , message:"successfull"})
+        }
+    } catch (error) {
+        
+    }
+}
+
 module.exports={
     HubAdminSingup,
     SendMailer,
@@ -254,4 +272,5 @@ module.exports={
     EditHubProfile,
     HubCreate,
     HubDataList,
+    BookedHistory,
 }
