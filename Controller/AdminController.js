@@ -77,9 +77,9 @@ const HubAdminListing = async(req,res)=>{
         const data = await HubAdmin.find({})
         console.log(data)
         if(data){
-            res.status(200).json({ data, message:"Successfull"})
+            res.status(200).json({ data, message:"successfull"})
         }else{
-            res.status(400).json({message:"Something went wrong"})
+            res.status(400).json({message:"Something went"})
         }
     } catch (error) {
         console.log(error)
