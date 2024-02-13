@@ -3,6 +3,7 @@ const express = require('express')
 const router = express()
 const Auth = require("../Middlewares/Auth.js")
 const userController = require('../Controller/UserController.js')
+const multer = require("../Middlewares/Multer.js")
 
 
 // *********  USER SIGN IN ******** //
@@ -25,5 +26,6 @@ router.get("/bookedhistory",Auth.userAuth,userController.BookedHistory)
 router.post("/changepropass",Auth.userAuth,userController.ChangeProfilePassword)
 router.post("/setnewpass",Auth.userAuth,userController.SetNewPassword)
 router.post("/resendotp",userController.ResendUserOtpVerify)
+router.post("/dpchange",multer.uploadOption.single("dp"),Auth.userAuth,userController.ChangeDp)
 
 module.exports = router 

@@ -7,6 +7,7 @@ const Booking = require("../Models/BookingModel");
 const randomstring = require("randomstring");
 const Stripe = require("stripe");
 const booked = require("../Models/BookingModel");
+const { uploadToCloudinary } = require("../Utils/cloudinary");
 require("dotenv").config();
 
 const securePassword = async (password) => {
@@ -156,10 +157,9 @@ const userLogin = async (req, res) => {
 const ViewProfile = async (req, res) => {
   try {
     const id = req.body.userId;
-    console.log(id, "issssssssss working");
     const data = await User.findById(id);
     if (data) {
-      console.log(data);
+      
       return res.status(200).json({ profile: data, message: "success" });
     } else {
       return res.status(400).json({ message: "Data not found" });
@@ -507,6 +507,7 @@ const BookedHistory = async (req, res) => {
 
 const ChangeProfilePassword = async (req, res) => {
   try {
+    console.log(req.body,"kkkkkkkkk")
     const userData = await User.findById(req.body.userId);
     const compare = await bcrypt.compare(
       req.body.changepassword,
@@ -570,6 +571,30 @@ const ResendUserOtpVerify = async (req, res) => {
   }
 };
 
+const ChangeDp = async(req,res)=>{
+  try {
+    console.log("Reached at backend")
+    console.log(req.file.path,"path to the picture")
+    console.log(req.body.userId,"user id")
+    const img = req.file.path
+    const UploadDp = await uploadToCloudinary(img , "dp");
+    const UpdateDp = await User.findOneAndUpdate(
+      {_id : req.body.userId},
+      {$set:{
+        profileimage : UploadDp.url
+      }}
+    )
+    if(UpdateDp){
+      console.log(UpdateDp,"DP SUCCESSFULLY UPDATED")
+      res.status(200).json({UpdateDp, message:"Successfully updated"})
+    }else{
+      res.status(400).json({message:"Something Went Wrong"})
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 module.exports = {
   UserSignin,
   userLogin,
@@ -591,4 +616,5 @@ module.exports = {
   ChangeProfilePassword,
   SetNewPassword,
   ResendUserOtpVerify,
+  ChangeDp,
 };

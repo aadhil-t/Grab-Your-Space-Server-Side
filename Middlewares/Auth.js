@@ -14,7 +14,7 @@ dotenv.config();
             const user = await User.findOne({
                 _id:decode.userId
             });
-            console.log(user,"user")
+           
             if(user){
                 if(user.is_blocked == false){
                     req.body.userId = decode.userId
