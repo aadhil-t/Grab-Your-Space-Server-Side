@@ -6,6 +6,7 @@ const nodemailer = require('nodemailer')
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
 const bcrypt = require('bcrypt');
+const { MultiUploadCloudinary } = require('../Utils/cloudinary')
 const { SendMail } = require('./UserController');
 // const { info } = require('console')
 const { clearScreenDown } = require('readline')
@@ -213,6 +214,10 @@ const HubCreate = async(req,res)=>{
     try {
         const HubAdminId = req.body.userId;
         const {name,email,mobile,location,seatcount,price} = req.body
+        const img = req.files
+        console.log(img,"kkkkkk")
+        const uploadImg = await MultiUploadCloudinary(img, "hubimages")
+        console.log(uploadImg,"This Is Image")
 
         const Hubs = new HubModel({
 
@@ -223,6 +228,7 @@ const HubCreate = async(req,res)=>{
            hublocation: location,
             seatcount,
             price: price,
+            images:uploadImg,
         })
 
         const HubData = await Hubs.save();

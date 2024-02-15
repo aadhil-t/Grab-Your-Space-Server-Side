@@ -39,6 +39,10 @@ const HubSchema = new Schema({
         type:Number,
         required:true
     },
+
+    images:{
+        type:Array,
+    },
 })
 
 const Hub = mongoose.model("Hub",HubSchema);
