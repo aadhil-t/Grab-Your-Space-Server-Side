@@ -425,14 +425,14 @@ const SingleHub = async (req, res) => {
 const StoreBookedData = async (req, res) => {
   try {
     console.log(req.body, "enter in backend booking ");
-    const { userId, selectedDate, selected, singleHubData, newTotalAmount} = req.body;
+    const { userId, selected, selectedDate, TotalAmount, SingleHubData} = req.body;
     const booked = new Booking({
       bookeduserid: userId,
-      bookedhubid: singleHubData,
-      AdminId: singleHubData.hubadminId,
+      bookedhubid: SingleHubData,
+      AdminId: SingleHubData.hubadminId,
       date: selectedDate,
       selectedseats: selected,
-      totalamount: newTotalAmount,
+      totalamount: TotalAmount,
     });
     console.log(booked)
     const bookedData = await booked.save();

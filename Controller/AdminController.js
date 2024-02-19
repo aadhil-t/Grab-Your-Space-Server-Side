@@ -1,5 +1,7 @@
 const User = require('../Models/UserModel')
 const HubAdmin = require('../Models/HubAdminModel')
+const HubModel = require('../Models/HubModel')
+const BookedData = require('../Models/BookingModel')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 
@@ -86,10 +88,25 @@ const HubAdminListing = async(req,res)=>{
     }
 }
 
+const HubApproval = async(req,res)=>{
+    try {
+        console.log("Enter in HubApproval")
+        const data = await HubModel.find({is_verified:false})
+        console.log(data,"data gott ")
+        if(data){
+            res.status(200).json({data,message:"successfull"})
+        }else{
+            res.status(400).json({message:"Something went wrong"})
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 module.exports={
     AdminLogin,
     ViewUserList,
     UserBlock,
     HubAdminListing,
+    HubApproval,
 }

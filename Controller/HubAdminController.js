@@ -6,7 +6,7 @@ const nodemailer = require('nodemailer')
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
 const bcrypt = require('bcrypt');
-const { MultiUploadCloudinary } = require('../Utils/cloudinary')
+const { MultiUploadCloudinary, uploadToCloudinary } = require('../Utils/cloudinary')
 const { SendMail } = require('./UserController');
 // const { info } = require('console')
 const { clearScreenDown } = require('readline')
@@ -212,12 +212,32 @@ const EditHubProfile = async(req,res)=>{
 
 const HubCreate = async(req,res)=>{
     try {
+        console.log("ooooooooooooooo")
         const HubAdminId = req.body.userId;
         const {name,email,mobile,location,seatcount,price} = req.body
-        const img = req.files
-        console.log(img,"kkkkkk")
-        const uploadImg = await MultiUploadCloudinary(img, "hubimages")
-        console.log(uploadImg,"This Is Image")
+        // const img = req.files
+        let { images, certificate } = req.files;
+
+     
+        // Check if images is an array, if not convert it to an array
+        if (!Array.isArray(images)) {
+            images = [images];
+        }
+
+
+        // Upload certificate image to Cloudinary if exists
+        let uploadedCertificate = null;
+        if (certificate) {
+            uploadedCertificate = await uploadToCloudinary(certificate[0].path, 'hubimages');
+        }
+
+        // const uploadImg = await MultiUploadCloudinary(img, "hubimages")
+
+        // console.log(uploadImg,"This Is Image")
+
+        // Upload images to Cloudinary
+        const uploadedImages = await MultiUploadCloudinary(images, "hubimages");
+
 
         const Hubs = new HubModel({
 
@@ -228,7 +248,9 @@ const HubCreate = async(req,res)=>{
            hublocation: location,
             seatcount,
             price: price,
-            images:uploadImg,
+            // images:uploadImg,
+            images: uploadedImages,
+            certificate: uploadedCertificate ? uploadedCertificate.url : null,
         })
 
         const HubData = await Hubs.save();
@@ -237,6 +259,8 @@ const HubCreate = async(req,res)=>{
 
     } catch (error) {
         console.log(error);
+        return res.status(500).json({ error: "Internal Server Error" });
+
     }
 }
 

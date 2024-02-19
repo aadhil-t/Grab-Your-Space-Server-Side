@@ -7,4 +7,5 @@ adminRoute.post('/login',adminController.AdminLogin);
 adminRoute.get('/users',adminController.ViewUserList);
 adminRoute.put('/userblock/:id',adminController.UserBlock);
 adminRoute.get('/hubadminlist',adminController.HubAdminListing);
+adminRoute.get('/hubapproval',adminController.HubApproval);
 module.exports = adminRoute

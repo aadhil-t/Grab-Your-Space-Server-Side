@@ -9,7 +9,12 @@ const HubSchema = new Schema({
         required: true,
     },
 
-
+    bookedData:{
+        type:Schema.Types.ObjectId,
+        ref:"booked",
+        required: true,
+       },
+  
     hubname:{
         type:String,
         required:true
@@ -43,6 +48,16 @@ const HubSchema = new Schema({
     images:{
         type:Array,
     },
+
+    certificate:{
+        type:String,
+        default:""
+    },
+
+    is_verified:{
+        type:Boolean,
+        default:false
+    }
 })
 
 const Hub = mongoose.model("Hub",HubSchema);
