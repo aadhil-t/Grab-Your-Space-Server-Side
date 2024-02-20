@@ -2,6 +2,7 @@ const User = require('../Models/UserModel')
 const HubAdmin = require('../Models/HubAdminModel')
 const HubModel = require('../Models/HubModel')
 const BookedData = require('../Models/BookingModel')
+const nodemailer = require('nodemailer')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 
@@ -17,8 +18,50 @@ const securePassword = async(password)=>{
 }
 
 
+const SendMailer = async(name, email, text)=>{
+    let content;
+        if(text == "Hub Verify Email"){
+        content =  `<html>
+        <body>
+        <h1>Welcome to Grab Your Space!</h1>
+            <p>Dear Hub Admin,</p>
+            <p>Your hub '${hubName}' has been created successfully.</p>
+            <p>Thank you for using our platform.</p>
+        </body>
+    </html>`
+        }
+    
+        let transporter = nodemailer.createTransport({
+            host:"smtp.gmail.com",
+            service:"Gmail",
+            secure: true,
+            port: 465,
+            auth: {
+                user: process.env.MyEmail,
+                pass:process.env.MailPass,
+            },
+        })
+    
+        const message = {
+            from:`Grab Your Space ${process.env.MyEmail}`,
+            to: email,
+            subject: text,
+            html: content,  
+        };
+    
+        transporter.sendMail(message,(err,info)=>{
+            if(err){
+                console.log(err,"its not working");
+            }else{
+                console.log("Email send");
+            }
+        });
+    };
+    
+
 const AdminLogin = async(req,res)=>{
     try {
+        console.log("admin login")
         const {email,password} = req.body
         const emailExist = await User.findOne({email:email});
         if(emailExist){
@@ -103,10 +146,21 @@ const HubApproval = async(req,res)=>{
     }
 }
 
+const HubAdminVerify = async(req,res)=>{
+    try {
+        console.log(req.body,"Reached Hub Admin verify controller")
+        // const data = HubAdmin.find({})
+        // console.log(data)        
+    } catch (error) {
+     console.log(error)   
+    }
+}
 module.exports={
     AdminLogin,
     ViewUserList,
     UserBlock,
     HubAdminListing,
     HubApproval,
+    HubAdminVerify,
+    SendMailer,
 }

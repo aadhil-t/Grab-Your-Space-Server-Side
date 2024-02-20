@@ -37,30 +37,33 @@ dotenv.config();
 }
 
 
-//  const adminAuth = async(req,res,next)=>{
-//     try {
-//         if(req.headers.authorization){
-//             let token = req.headers.authorization.split(" ")[1];
-//             const decoded = jwt.verify(token,process.env.AdminSecret);
-//             const admin = await User.findOne({
-//                 _id: decoded.adminId,
-//                 is_admin: true,
-//             })
+ const adminAuth = async(req,res,next)=>{
+    try {
+        if(req.headers.authorization){
+            console.log(req.headers,"momomoomom")
+            let token = req.headers.authorization.split(" ")[1];
+            console.log(token,"kkkkkkk")
+            const decoded = jwt.verify(token,process.env.AdminSecret);
+            const admin = await User.findOne({
+                _id: decoded.adminId,
+                is_admin: true,
+            })
             
-//             if(admin){
-//                 next()
-//             }
-//             else{
-//                 return res.status(400).json({message:"User not authorised or invalid user"});
-//             }
-//         }
-//         else{
-//             return res.status(400).json({message:"User not authorised"})
-//         }
-//     } catch (error) {
-//         console.log(error.message)
-//     }
-// }
+            if(admin){
+                req.body.adminId = decoded.adminId
+                next()
+            }
+            else{
+                return res.status(400).json({message:"User not authorised or invalid user"});
+            }
+        }
+        else{
+            return res.status(400).json({message:"User not authorised"})
+        }
+    } catch (error) {
+        console.log(error.message)
+    }
+}
 
 
 const hubadminAuth = async(req,res,next)=>{
@@ -94,7 +97,7 @@ const hubadminAuth = async(req,res,next)=>{
 }
 module.exports={
     userAuth,
-    // adminAuth
+    adminAuth,
     hubadminAuth
 
 }
