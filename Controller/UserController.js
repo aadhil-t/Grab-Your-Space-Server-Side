@@ -8,7 +8,10 @@ const randomstring = require("randomstring");
 const Stripe = require("stripe");
 const booked = require("../Models/BookingModel");
 const { uploadToCloudinary } = require("../Utils/cloudinary");
+const { ObjectId } = require("mongodb");
 require("dotenv").config();
+const mongoose = require('mongoose');
+
 
 const securePassword = async (password) => {
   try {
@@ -53,8 +56,8 @@ const UserSignin = async (req, res) => {
     }
   } catch (error) {
     console.log(error.message);
-    res.status(500).json({
-      message: "Internal server error",
+      res.status(500).json({
+        message: "Internal server error",
     });
   }
 };
@@ -399,7 +402,7 @@ const PassOtpVerify = async (req, res) => {
 
 const HubListing = async (req, res) => {
   try {
-    let HubData = await HubModel.find();
+    let HubData = await HubModel.find({is_verified:true});
     if (HubData) {
       res.status(200).json(HubData);
     }
@@ -410,13 +413,43 @@ const HubListing = async (req, res) => {
 
 const SingleHub = async (req, res) => {
   try {
+    console.log("innnn");
     const objid = req.params.objId;
+    const date = req.params.selectedDate;
     console.log(req.params, "iiiiiiiiipppppppppppp");
+    const objectId = new mongoose.Types.ObjectId(objid);
+
+    // const fullData = await Booking.find({date:date,_id:objid})
+    const fullData = await Booking.find({ date: date, bookedhubid: objectId  });
+
+    console.log(fullData,"full data");
+
+
+// Assuming FullData is the array of objects you received from the query
+
+// Define an empty array to store the extracted values
+const selectedSeatsValues = [];
+
+// Iterate over each object in FullData
+fullData.forEach((booking) => {
+    // Iterate over each entry in the selectedseats array of the current booking
+    booking.selectedseats.forEach((seat) => {
+        // Push the value of each seat into the selectedSeatsValues array
+        selectedSeatsValues.push(seat.value);
+    });
+});
+
+// Now selectedSeatsValues contains all the values from the selectedseats arrays
+console.log(selectedSeatsValues);
+
+
+
+
     const singleData = await HubModel.findById(objid);
     if (singleData) {
-      res.status(200).json(singleData);
+      res.status(200).json({singleData,selectedSeatsValues});
     }
-    console.log(singleData);
+    // console.log(singleData);
   } catch (error) {
     console.log(error);
   }

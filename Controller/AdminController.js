@@ -25,7 +25,7 @@ const SendMailer = async(name, email, text)=>{
         <body>
         <h1>Welcome to Grab Your Space!</h1>
             <p>Dear Hub Admin,</p>
-            <p>Your hub '${hubName}' has been created successfully.</p>
+            <p>Your hub '${name}' has been Verified successfully.</p>
             <p>Thank you for using our platform.</p>
         </body>
     </html>`
@@ -149,8 +149,20 @@ const HubApproval = async(req,res)=>{
 const HubAdminVerify = async(req,res)=>{
     try {
         console.log(req.body,"Reached Hub Admin verify controller")
-        // const data = HubAdmin.find({})
-        // console.log(data)        
+        const HubName = req.body.Data.hubname
+        console.log(HubName)
+        const HubData = await HubModel.findOneAndUpdate({ _id : req.body.Data._id },{ $set: { is_verified : true }})
+        console.log(HubData)
+        if(HubData){
+            SendMailer(
+                HubName, 
+                HubData.hubemail,
+                "Hub Verify Email")
+                res.status(200).json({ HubData, message:"Successfully Verified" }) 
+        }else{
+            res.status(400).json({ message:"Failed to Verified" }) 
+        }
+        console.log()        
     } catch (error) {
      console.log(error)   
     }

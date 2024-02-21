@@ -9,11 +9,11 @@ const HubSchema = new Schema({
         required: true,
     },
 
-    bookedData:{
-        type:Schema.Types.ObjectId,
-        ref:"booked",
-        required: true,
-       },
+    // bookedData:{
+    //     type:Schema.Types.ObjectId,
+    //     ref:"booked",
+    //     required: true,
+    //    },
   
     hubname:{
         type:String,

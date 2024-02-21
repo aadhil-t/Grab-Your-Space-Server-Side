@@ -18,7 +18,7 @@ router.post('/forgotmail',userController.SentForgotPasswordMail);
 router.post('/changepass',userController.ChangePassword);
 router.post('/passotverify',userController.PassOtpVerify);
 router.get('/hublisting',Auth.userAuth,userController.HubListing)
-router.get('/singlehub/:objId',Auth.userAuth,userController.SingleHub)
+router.get('/singlehub/:objId/:selectedDate',Auth.userAuth,userController.SingleHub)
 router.post('/booking',Auth.userAuth,userController.StoreBookedData)
 router.get('/bookeddetails/:bookedId',Auth.userAuth,userController.BookedData)
 router.put("/updatepaystatus",Auth.userAuth,userController.UpdateStatus)
