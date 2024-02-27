@@ -7,6 +7,7 @@ const Booking = require("../Models/BookingModel");
 const randomstring = require("randomstring");
 const Stripe = require("stripe");
 const booked = require("../Models/BookingModel");
+const RatingModel = require("../Models/RatingModel")
 const { uploadToCloudinary } = require("../Utils/cloudinary");
 const { ObjectId } = require("mongodb");
 require("dotenv").config();
@@ -416,7 +417,9 @@ const SingleHub = async (req, res) => {
     console.log("innnn");
     const objid = req.params.objId;
     const date = req.params.selectedDate;
-    console.log(req.params, "iiiiiiiiipppppppppppp");
+    const ReviewData = await RatingModel.find({hubId:objid}).populate("userId")
+    console.log(ReviewData,"this is hubId");
+    console.log(req.params, "kk");
     const objectId = new mongoose.Types.ObjectId(objid);
 
     // const fullData = await Booking.find({date:date,_id:objid})
@@ -447,7 +450,7 @@ console.log(selectedSeatsValues);
 
     const singleData = await HubModel.findById(objid);
     if (singleData) {
-      res.status(200).json({singleData,selectedSeatsValues});
+      res.status(200).json({singleData,selectedSeatsValues ,ReviewData});
     }
     // console.log(singleData);
   } catch (error) {
@@ -628,6 +631,31 @@ const ChangeDp = async(req,res)=>{
   }
 }
 
+const ReviewRating = async(req,res)=>{
+  try {
+    console.log(req.body)
+    const { rating, review,userId,objId} = req.body;
+    console.log(rating,review,userId,objId,"reached at backend"); 
+    const ratingData = new RatingModel({
+      rating,
+      review,
+      userId,
+      hubId:objId,
+    });
+    const RatingData = await ratingData.save();
+    if(RatingData){
+      res.status(200).json({RatingData,message:"successfully updated"})
+    }else{
+      res.status(400).json({message:"Failed to update"})
+    }
+    console.log(RatingData,"saved successfully")
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
+ 
 module.exports = {
   UserSignin,
   userLogin,
@@ -650,4 +678,5 @@ module.exports = {
   SetNewPassword,
   ResendUserOtpVerify,
   ChangeDp,
+  ReviewRating,
 };

@@ -27,5 +27,7 @@ router.post("/changepropass",Auth.userAuth,userController.ChangeProfilePassword)
 router.post("/setnewpass",Auth.userAuth,userController.SetNewPassword)
 router.post("/resendotp",userController.ResendUserOtpVerify)
 router.post("/dpchange",multer.uploadOption.single("dp"),Auth.userAuth,userController.ChangeDp)
+router.post("/userrating",Auth.userAuth,userController.ReviewRating)
+
 
 module.exports = router 
