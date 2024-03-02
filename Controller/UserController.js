@@ -401,23 +401,47 @@ const PassOtpVerify = async (req, res) => {
   } catch (error) {}
 };
 
+
 const HubListing = async (req, res) => {
   try {
-    let HubData = await HubModel.find({is_verified:true});
+    const { active, search } = req.query;
+    console.log(active, search, "active");
+
+    const perpage = 4;
+    const skip = (parseInt(active) - 1) * perpage; // Ensure active is parsed to integer
+
+    let query = { is_verified: true };
+
+    if (search) { // Check if search term is provided
+      query.$or = [
+        { hubname: { $regex: search, $options: "i" } },
+        { hublocation: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    const Count = await HubModel.countDocuments(query); // Count documents based on query
+    console.log(Count, "count of document");
+
+    const HubData = await HubModel.find(query).skip(skip).limit(perpage); // Apply query for pagination
+
     if (HubData) {
-      res.status(200).json(HubData);
+      res.status(200).json({ HubData, Count, perpage, active });
+    } else {
+      res.status(404).json({ message: "No data found" });
     }
   } catch (error) {
     console.log(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 const SingleHub = async (req, res) => {
   try {
     console.log("innnn");
     const objid = req.params.objId;
     const date = req.params.selectedDate;
-    const ReviewData = await RatingModel.find({hubId:objid}).populate("userId")
+    const ReviewData = await RatingModel.find({hubId:objid}).populate("userId");
     console.log(ReviewData,"this is hubId");
     console.log(req.params, "kk");
     const objectId = new mongoose.Types.ObjectId(objid);
