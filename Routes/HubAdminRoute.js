@@ -9,14 +9,13 @@ hubadminRoute.get("/verifyemail/:id/:token",HubAdminController.VerifyEmail)
 hubadminRoute.post("/login",HubAdminController.HubAdminLogin)
 hubadminRoute.get("/profile",Auth.hubadminAuth,HubAdminController.HubProfile)
 hubadminRoute.post('/editprofile',Auth.hubadminAuth,HubAdminController.EditHubProfile)
-// hubadminRoute.post('/createhub',multer.uploadOption.array("images",4),Auth.hubadminAuth,HubAdminController.HubCreate);
 hubadminRoute.post(
     '/createhub',
     multer.uploadOption.fields([{ name: 'images', maxCount: 4 }, { name: 'certificate', maxCount: 1 }]),
     Auth.hubadminAuth,
     HubAdminController.HubCreate
   );
-  
 hubadminRoute.get('/hubdata',Auth.hubadminAuth,HubAdminController.HubDataList)
 hubadminRoute.get('/bookedhistory',Auth.hubadminAuth,HubAdminController.BookedHistory)
+hubadminRoute.post('/addoffer',Auth.hubadminAuth,HubAdminController.AddOffer)
 module.exports = hubadminRoute

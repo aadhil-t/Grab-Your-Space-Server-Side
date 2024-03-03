@@ -8,12 +8,6 @@ const HubSchema = new Schema({
         ref: "hubadmin", // Replace with the actual model name you are referencing
         required: true,
     },
-
-    // bookedData:{
-    //     type:Schema.Types.ObjectId,
-    //     ref:"booked",
-    //     required: true,
-    //    },
   
     hubname:{
         type:String,

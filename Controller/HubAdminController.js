@@ -2,6 +2,7 @@ const HubAdmin = require('../Models/HubAdminModel')
 const HubModel = require("../Models/HubModel")
 const BookingModel = require("../Models/BookingModel")
 const mailToken = require('../Models/TokenModel')
+const OfferModel = require('../Models/OfferModel')
 const nodemailer = require('nodemailer')
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
@@ -10,6 +11,7 @@ const { MultiUploadCloudinary, uploadToCloudinary } = require('../Utils/cloudina
 const { SendMail } = require('./UserController');
 // const { info } = require('console')
 const { clearScreenDown } = require('readline')
+const { query } = require('express')
 
 
 
@@ -174,7 +176,8 @@ const HubAdminLogin = async(req,res)=>{
 
 const HubProfile = async(req,res)=>{
     try {
-        const HubAdminId = await HubAdmin.findById({_id: req.body.userId});
+        const HubAdminId = await HubAdmin.findById({_id: req.body.userId})
+        console.log(Hub,"Hubbbbbbbbbb")
         if(HubAdminId){
             return res.status(200).json({ profile: HubAdminId, message:"Success"})
         }else{
@@ -264,7 +267,6 @@ const HubCreate = async(req,res)=>{
     }
 }
 
-
 const HubDataList = async(req,res)=>{
     try {
         let hubData = await HubModel.find({hubadminId:req.body.userId}).populate('hubadminId')
@@ -275,7 +277,6 @@ const HubDataList = async(req,res)=>{
         
     }
 }
-
 
 const BookedHistory = async(req,res)=>{
     try {
@@ -293,6 +294,24 @@ const BookedHistory = async(req,res)=>{
     }
 }
 
+const AddOffer = async(req,res)=>{
+    try {
+        console.log(req.body)
+        // const { offername, offerpercentage, seatcount} = req.body;
+        // console.log(offername, offerpercentage, seatcount,"Reached at AddOffer backend")
+        // const offer = new OfferModel({
+        //     hubId,
+        //     offername,
+        //     offerpercentage,
+        //     seatcount,
+        // })
+        // const OfferData = await offer.save();
+        // console.log(OfferData,"added offer")
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 module.exports={
     HubAdminSingup,
     SendMailer,
@@ -303,4 +322,5 @@ module.exports={
     HubCreate,
     HubDataList,
     BookedHistory,
+    AddOffer,
 }
