@@ -12,6 +12,8 @@ const { SendMail } = require('./UserController');
 // const { info } = require('console')
 const { clearScreenDown } = require('readline')
 const { query } = require('express')
+const { errorMonitor } = require('events')
+const { find } = require('../Models/UserModel')
 
 
 
@@ -325,6 +327,22 @@ const AddOffer = async(req,res)=>{
     }
 }
 
+const OfferList = async(req,res)=>{
+    try {
+        console.log("Reached at Offer list Backend ")
+        const OfferData = await OfferModel.find({});
+        if(OfferData){
+            res.status(200).json({OfferData, message:"Successfull"})
+        }
+        else{
+            res.status(400).json({message:"Something went wrong!"})
+        }
+        console.log(OfferData)
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 module.exports={
     HubAdminSingup,
     SendMailer,
@@ -336,4 +354,5 @@ module.exports={
     HubDataList,
     BookedHistory,
     AddOffer,
+    OfferList,
 }

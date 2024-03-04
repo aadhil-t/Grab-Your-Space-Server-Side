@@ -18,4 +18,5 @@ hubadminRoute.post(
 hubadminRoute.get('/hubdata',Auth.hubadminAuth,HubAdminController.HubDataList)
 hubadminRoute.get('/bookedhistory',Auth.hubadminAuth,HubAdminController.BookedHistory)
 hubadminRoute.post('/addoffer',Auth.hubadminAuth,HubAdminController.AddOffer)
+hubadminRoute.get('/offerlist',Auth.hubadminAuth,HubAdminController.OfferList)
 module.exports = hubadminRoute
