@@ -177,7 +177,6 @@ const HubAdminLogin = async(req,res)=>{
 const HubProfile = async(req,res)=>{
     try {
         const HubAdminId = await HubAdmin.findById({_id: req.body.userId})
-        console.log(Hub,"Hubbbbbbbbbb")
         if(HubAdminId){
             return res.status(200).json({ profile: HubAdminId, message:"Success"})
         }else{
@@ -296,17 +295,31 @@ const BookedHistory = async(req,res)=>{
 
 const AddOffer = async(req,res)=>{
     try {
+        console.log("object")
         console.log(req.body)
-        // const { offername, offerpercentage, seatcount} = req.body;
-        // console.log(offername, offerpercentage, seatcount,"Reached at AddOffer backend")
-        // const offer = new OfferModel({
-        //     hubId,
-        //     offername,
-        //     offerpercentage,
-        //     seatcount,
-        // })
-        // const OfferData = await offer.save();
-        // console.log(OfferData,"added offer")
+        const { hubId, offername, offerpercentage, seatcount} = req.body;
+        console.log(hubId, offername, offerpercentage, seatcount,"Reached at AddOffer backend")
+        const OfferExist = await OfferModel.find({hubId:hubId})
+        if(OfferExist){
+            res.status(403).json({message:"One Offer is Already Exist"})
+        }
+        else{
+            const offer = new OfferModel({
+                hubId,
+                offername,
+                offerpercentage,
+                seatcount,
+            })
+            const OfferData = await offer.save();
+        
+        if(OfferData){
+            res.status(200).json({OfferData:OfferData, message:"Successfully Added offer"})
+        }
+        else{
+            res.status(400).json({message:"Something Went wrong"})
+        }
+        console.log(OfferData,"added offer")
+    }
     } catch (error) {
         console.log(error)
     }

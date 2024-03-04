@@ -8,6 +8,7 @@ const randomstring = require("randomstring");
 const Stripe = require("stripe");
 const booked = require("../Models/BookingModel");
 const RatingModel = require("../Models/RatingModel")
+const OfferModel = require('../Models/OfferModel')
 const { uploadToCloudinary } = require("../Utils/cloudinary");
 const { ObjectId } = require("mongodb");
 require("dotenv").config();
@@ -103,7 +104,7 @@ const userLogin = async (req, res) => {
       } else {
         if (exist.is_blocked == true) {
           return res
-            .status(400)
+            .status(403)
             .json({ message: "Your Account is blocked by admin" });
         } else {
           const token = jwt.sign({ userId: exist.id }, process.env.UserSecret, {
@@ -128,7 +129,7 @@ const userLogin = async (req, res) => {
         } else {
           if (emailExist.is_blocked) {
             return res
-              .status(400)
+              .status(403)
               .json({ message: "Your Account is blocked by admin" });
           } else {
             if (!emailExist.is_verified) {
@@ -190,9 +191,9 @@ const EditProfile = async (req, res) => {
       console.log("edit");
       return res
         .status(200)
-        .json({ data: editUser, message: "Profile edited successfully" });
+        .json({ data: editUser, message: "Profile Pic Updated Successfully" });
     } else {
-      return res.status(400).json({ message: "Failed to edit profil" });
+      return res.status(400).json({ message: "Failed to Updated Profil Pic!" });
     }
   } catch (error) {
     console.log(error);
@@ -357,7 +358,7 @@ const SentForgotPasswordMail = async (req, res) => {
       );
       res.status(200).json({ message: "Check your email", id: UserData._id });
     } else {
-      res.status(400).json({ message: "Something went wrong" });
+      res.status(400).json({ message: "Existing Password is Wrong" });
     }
   } catch (error) {
     console.log(error);
@@ -442,6 +443,7 @@ const SingleHub = async (req, res) => {
     const objid = req.params.objId;
     const date = req.params.selectedDate;
     const ReviewData = await RatingModel.find({hubId:objid}).populate("userId");
+    const offerData = await OfferModel.findOne({hubId:objid})
     console.log(ReviewData,"this is hubId");
     console.log(req.params, "kk");
     const objectId = new mongoose.Types.ObjectId(objid);
@@ -451,12 +453,9 @@ const SingleHub = async (req, res) => {
 
     console.log(fullData,"full data");
 
-
 // Assuming FullData is the array of objects you received from the query
-
 // Define an empty array to store the extracted values
 const selectedSeatsValues = [];
-
 // Iterate over each object in FullData
 fullData.forEach((booking) => {
     // Iterate over each entry in the selectedseats array of the current booking
@@ -465,16 +464,11 @@ fullData.forEach((booking) => {
         selectedSeatsValues.push(seat.value);
     });
 });
-
 // Now selectedSeatsValues contains all the values from the selectedseats arrays
 console.log(selectedSeatsValues);
-
-
-
-
     const singleData = await HubModel.findById(objid);
     if (singleData) {
-      res.status(200).json({singleData,selectedSeatsValues ,ReviewData});
+      res.status(200).json({singleData,selectedSeatsValues ,ReviewData ,offerData});
     }
     // console.log(singleData);
   } catch (error) {
@@ -497,7 +491,7 @@ const StoreBookedData = async (req, res) => {
     console.log(booked)
     const bookedData = await booked.save();
     if (bookedData) {
-      res.status(200).json({ booked: true, data: bookedData });
+      res.status(200).json({ booked: true, data: bookedData ,message:"Successfully Booked"});
     } else {
       return res
         .status(400)
@@ -526,7 +520,7 @@ const BookedData = async (req, res) => {
       automatic_payment_methods: { enabled: true },
     });
     console.log(paymentintent, "intent");
-    res.status(200).json({ data, clientSecret: paymentintent.client_secret });
+    res.status(200).json({ data, clientSecret: paymentintent.client_secret, message:"Payment Successfull"});
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -576,7 +570,7 @@ const ChangeProfilePassword = async (req, res) => {
     if (compare) {
       res.status(200).json({ compare, message: "successfull" });
     } else {
-      res.status(400).json({ message: "Something Went Wrong !" });
+      res.status(400).json({ message: "Existing Password is Wrong!" });
     }
   } catch (error) {
     console.log(error);
@@ -599,10 +593,10 @@ const SetNewPassword = async (req, res) => {
         { _id: req.body.userId },
         { $set: { password: hashnewpass } }
       );
-      res.status(200).json({ message: "successfully updated" });
+      res.status(200).json({ message: "New Password Updated Successfully" });
       console.log(userData);
     } else {
-      res.status(400).json({ userData, message: "Wrong !!" });
+      res.status(400).json({ userData, message: "Existing Password Create New" });
     }
   } catch (error) {
     console.log(error);
@@ -646,7 +640,7 @@ const ChangeDp = async(req,res)=>{
     )
     if(UpdateDp){
       console.log(UpdateDp,"DP SUCCESSFULLY UPDATED")
-      res.status(200).json({UpdateDp, message:"Successfully updated"})
+      res.status(200).json({UpdateDp, message:"Successfully Updated Profile Pic"})
     }else{
       res.status(400).json({message:"Something Went Wrong"})
     }
