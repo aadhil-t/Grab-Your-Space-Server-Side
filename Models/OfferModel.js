@@ -9,6 +9,12 @@ const OfferSchema = new Schema ({
         required:true,
     },
     
+    AdminId:{
+        type:Schema.Types.ObjectId,
+        ref:"hubadmin",
+        required:true,
+    },
+    
     offername:{
         type:String,
         required:true,

@@ -299,15 +299,18 @@ const AddOffer = async(req,res)=>{
     try {
         console.log("object")
         console.log(req.body)
-        const { hubId, offername, offerpercentage, seatcount} = req.body;
+        const {hubAdminId, hubId, offername, offerpercentage, seatcount} = req.body;
         console.log(hubId, offername, offerpercentage, seatcount,"Reached at AddOffer backend")
         const OfferExist = await OfferModel.find({hubId:hubId})
-        if(OfferExist){
+        if(OfferExist.length > 0){
             res.status(403).json({message:"One Offer is Already Exist"})
+            console.log(OfferExist,"ldldldlddl")
         }
         else{
+            console.log("object")
             const offer = new OfferModel({
                 hubId,
+                AdminId:hubAdminId,
                 offername,
                 offerpercentage,
                 seatcount,
@@ -327,21 +330,38 @@ const AddOffer = async(req,res)=>{
     }
 }
 
-const OfferList = async(req,res)=>{
-    try {
-        console.log("Reached at Offer list Backend ")
-        const OfferData = await OfferModel.find({});
-        if(OfferData){
-            res.status(200).json({OfferData, message:"Successfull"})
+    const OfferList = async (req, res) => {
+        try {
+            const userid = req.body.userId; // Extract userId from the request body
+            console.log(userid);
+            console.log("Reached at Offer list Backend ");
+            const OfferData = await OfferModel.find({AdminId:userid}) // Find offers by userId
+            if (OfferData) {
+                res.status(200).json({ OfferData, message: "Successfull" });
+            } else {
+                res.status(400).json({ message: "Something went wrong!" });
+            }
+            console.log(OfferData);
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ message: "Internal Server Error" });
         }
-        else{
-            res.status(400).json({message:"Something went wrong!"})
-        }
-        console.log(OfferData)
-    } catch (error) {
-        console.log(error)
     }
-}
+
+    const OfferDelete = async(req,res)=>{
+        try {
+            console.log(req.body)
+            const DeleteData = await OfferModel.findByIdAndDelete({_id:req.body.id})
+            if(DeleteData){
+                res.status(200).json({DeleteData, message:"Offer Deleted Successfully"});
+            }else{
+                res.status(400).json({message:"Something Went Wrong!"});
+            }
+            console.log(DeleteData)
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
 module.exports={
     HubAdminSingup,
@@ -355,4 +375,5 @@ module.exports={
     BookedHistory,
     AddOffer,
     OfferList,
+    OfferDelete,
 }
