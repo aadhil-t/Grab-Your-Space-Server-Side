@@ -672,7 +672,45 @@ const ReviewRating = async(req,res)=>{
   }
 }
 
+const BookedSinglePage = async(req,res)=>{
+  try {
+    console.log("Reached")
+    const bookedData = await Booking.findById({_id:req.params.BookedId}).populate('bookedhubid').populate('bookeduserid');
+    console.log(bookedData,"kitite maraa ...");
+    if(bookedData){
+      res.status(200).json({bookedData, message:"Successfull"})
+    }else{
+      res.status(200).json({bookedData, message:"Successfull"})
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
 
+const CancelBooking = async(req,res)=>{
+  try {
+    console.log("Reached at Backend CancelBooking ")
+    const {userId, hubId, BookedId} = req.body
+    console.log(userId,hubId,BookedId,"got it man")
+    const BookedData = await Booking.findOne({_id:BookedId});
+    console.log(BookedData)
+    if(BookedData){
+      const walletAmount = await User.findOne({_id:userId});
+      const balance = walletAmount.wallet + BookedData.totalamount;
+      await User.updateOne( { _id : userId } , {$set: { wallet : balance } });
+      await Booking.findOneAndUpdate(
+        { _id : BookedId },
+        { $set : { paymentstatus : "cancel" } });
+
+        res.status(200).json({message:"Your booking has been successfully cancelled"})
+    }
+    else{
+      res.status(400).json({message:"Something Went Wrong"})
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
  
 module.exports = {
   UserSignin,
@@ -697,4 +735,6 @@ module.exports = {
   ResendUserOtpVerify,
   ChangeDp,
   ReviewRating,
+  BookedSinglePage,
+  CancelBooking,
 };

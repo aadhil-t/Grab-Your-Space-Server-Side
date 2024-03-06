@@ -28,6 +28,8 @@ router.post("/setnewpass",Auth.userAuth,userController.SetNewPassword)
 router.post("/resendotp",userController.ResendUserOtpVerify)
 router.post("/dpchange",multer.uploadOption.single("dp"),Auth.userAuth,userController.ChangeDp)
 router.post("/userrating",Auth.userAuth,userController.ReviewRating)
+router.get("/bookedsingledata/:BookedId",Auth.userAuth,userController.BookedSinglePage)
+router.post("/cancelbook",Auth.userAuth,userController.CancelBooking)
 
 
 module.exports = router 
