@@ -20,4 +20,5 @@ hubadminRoute.get('/bookedhistory',Auth.hubadminAuth,HubAdminController.BookedHi
 hubadminRoute.post('/addoffer',Auth.hubadminAuth,HubAdminController.AddOffer)
 hubadminRoute.get('/offerlist',Auth.hubadminAuth,HubAdminController.OfferList)
 hubadminRoute.post('/offerdelete',Auth.hubadminAuth,HubAdminController.OfferDelete)
+hubadminRoute.get('/userdatachat',Auth.hubadminAuth,HubAdminController.ChatUserData)
 module.exports = hubadminRoute

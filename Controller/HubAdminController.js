@@ -1,4 +1,5 @@
 const HubAdmin = require('../Models/HubAdminModel')
+const UserModel = require('../Models/UserModel')
 const HubModel = require("../Models/HubModel")
 const BookingModel = require("../Models/BookingModel")
 const mailToken = require('../Models/TokenModel')
@@ -363,6 +364,22 @@ const AddOffer = async(req,res)=>{
         }
     }
 
+    const ChatUserData = async(req,res)=>{
+        try {
+            console.log("Reached ChatUserData Backend ")
+            const UserData = await UserModel.find();
+            console.log(UserData)
+            if(UserData){
+                res.status(200).json({UserData, message:"Successfull got"})
+            }else{
+                res.status(400).json({ message:"Something went wrong"})
+            }
+            console.log(UserData)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
 module.exports={
     HubAdminSingup,
     SendMailer,
@@ -376,4 +393,5 @@ module.exports={
     AddOffer,
     OfferList,
     OfferDelete,
+    ChatUserData,   
 }

@@ -1,4 +1,5 @@
 const User = require("../Models/UserModel");
+const Admin = require("../Models/HubAdminModel")
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
@@ -405,13 +406,30 @@ const PassOtpVerify = async (req, res) => {
 
 const HubListing = async (req, res) => {
   try {
-    const { active, search } = req.query;
-    console.log(active, search, "active");
+    const { active, search, sortData,selectedData} = req.query;
+    console.log(active, search, sortData,selectedData, "active");
 
     const perpage = 4;
+    let sortValue;
+    let array = [];
+
+  
+    const locationFilter = JSON.parse(selectedData);
+
+
+    locationFilter.map((item) => {
+      array.push(item.value);
+    });
+    console.log(locationFilter)
+
     const skip = (parseInt(active) - 1) * perpage; // Ensure active is parsed to integer
 
     let query = { is_verified: true };
+
+    if (Array.isArray(locationFilter) && locationFilter.length > 0) {
+      let locationValues = locationFilter.map(item => item.value);
+      query.hublocation = { $in: locationValues };
+    }
 
     if (search) { // Check if search term is provided
       query.$or = [
@@ -420,10 +438,17 @@ const HubListing = async (req, res) => {
       ];
     }
 
+    if (sortData === "highToLow") {
+      sortValue = -1;
+    } else if (sortData === "lowToHigh") {
+      sortValue = 1;
+    }
+    
     const Count = await HubModel.countDocuments(query); // Count documents based on query
     console.log(Count, "count of document");
 
-    const HubData = await HubModel.find(query).skip(skip).limit(perpage); // Apply query for pagination
+    const HubData = await HubModel.find(query).skip(skip).limit(perpage).sort({price:sortValue});
+    ; // Apply query for pagination
 
     if (HubData) {
       res.status(200).json({ HubData, Count, perpage, active });
@@ -544,13 +569,26 @@ const UpdateStatus = async (req, res) => {
 const BookedHistory = async (req, res) => {
   try {
     console.log("reached backend BookedHistory");
+    const { active } = req.query
+    console.log(active,"oaoaaaoaaoao") 
+
+    const perpage = 4;
+    const skip = (parseInt(active)-1) * perpage;
+
     const userId = req.body.userId;
+    const query = {bookeduserid : userId}  
+
+
+    const Count = await booked.countDocuments(query);
+    console.log(Count,"counttttt");
+
     const data = await booked
-      .find({ bookeduserid: userId })
+      .find(query).skip(skip).limit(perpage)
       .populate("bookedhubid")
       .populate("bookeduserid");
+
     if (data) {
-      res.status(200).json({ data, message: "successfull" });
+      res.status(200).json({ data, Count, perpage, active, message: "successfull" });
     } else {
       res.status(400).json({ message: "something went wrong !" });
     }
@@ -712,6 +750,20 @@ const CancelBooking = async(req,res)=>{
   }
 }
  
+const ChatAdminData = async(req,res)=>{
+  try {
+    console.log("Reached ChatAdminData Backend")
+    const AdminData = await Admin.find()
+    if(AdminData){
+      res.status(200).json({AdminData,message:"successfully got"})
+    }else{
+      res.status(400).json({message:"successfully got"})
+    }
+    console.log(AdminData,"kitiii")
+  } catch (error) {
+    console.log(error)
+  }
+}
 module.exports = {
   UserSignin,
   userLogin,
@@ -737,4 +789,5 @@ module.exports = {
   ReviewRating,
   BookedSinglePage,
   CancelBooking,
+  ChatAdminData,
 };
