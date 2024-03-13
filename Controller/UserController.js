@@ -420,7 +420,6 @@ const HubListing = async (req, res) => {
     locationFilter.map((item) => {
       array.push(item.value);
     });
-    console.log(locationFilter)
 
     const skip = (parseInt(active) - 1) * perpage; // Ensure active is parsed to integer
 
@@ -544,8 +543,8 @@ const BookedData = async (req, res) => {
       currency: "inr",
       automatic_payment_methods: { enabled: true },
     });
-    console.log(paymentintent, "intent");
-    res.status(200).json({ data, clientSecret: paymentintent.client_secret, message:"Payment Successfull"});
+    console.log(paymentintent.id, "intent");
+    res.status(200).json({ data,TransactionId:paymentintent.id, clientSecret: paymentintent.client_secret, message:"Payment Successfull"});
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -554,10 +553,12 @@ const BookedData = async (req, res) => {
 
 const UpdateStatus = async (req, res) => {
   try {
+    const TraasactionId = req.body.paymentIntent.id
+    console.log(TraasactionId,"kouuuuuuuuuuiuii")
     console.log("enter into UpdateStatus");
     const update = await booked.updateOne(
       { _id: req.body.id },
-      { $set: { paymentstatus: "success" } }
+      { $set: { paymentstatus: "success" ,transactionid:TraasactionId } }
     );
     console.log(update);
     res.status(200).json({ update, message: "update succeessfully" });

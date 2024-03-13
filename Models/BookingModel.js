@@ -42,6 +42,9 @@ const BookingSchema = new mongoose.Schema({
         default:"pending",
     },
 
+    transactionid:{
+      type:String,
+    }
 
 })
 
