@@ -751,20 +751,20 @@ const CancelBooking = async(req,res)=>{
   }
 }
  
-const ChatAdminData = async(req,res)=>{
-  try {
-    console.log("Reached ChatAdminData Backend")
-    const AdminData = await Admin.find()
-    if(AdminData){
-      res.status(200).json({AdminData,message:"successfully got"})
-    }else{
-      res.status(400).json({message:"successfully got"})
-    }
-    console.log(AdminData,"kitiii")
-  } catch (error) {
-    console.log(error)
-  }
-}
+// const ChatAdminData = async(req,res)=>{
+//   try {
+//     console.log("Reached ChatAdminData Backend")
+//     const AdminData = await Admin.find()
+//     if(AdminData){
+//       res.status(200).json({AdminData,message:"successfully got"})
+//     }else{
+//       res.status(400).json({message:"successfully got"})
+//     }
+//     console.log(AdminData,"kitiii")
+//   } catch (error) {
+//     console.log(error)
+//   }
+// }
 module.exports = {
   UserSignin,
   userLogin,
@@ -790,5 +790,5 @@ module.exports = {
   ReviewRating,
   BookedSinglePage,
   CancelBooking,
-  ChatAdminData,
+  // ChatAdminData,
 };

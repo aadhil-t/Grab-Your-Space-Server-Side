@@ -364,6 +364,75 @@ const AddOffer = async(req,res)=>{
         }
     }
 
+    const DashboardChart = async (req, res) => {
+        try {
+            const Adminid = req.body.userId;
+            console.log(Adminid, "Reached at dashboard Chart Backend");
+    
+            // Get today's date
+            const EndDate = new Date(); // End date (today)
+            const PresentMonthStartDate = new Date(EndDate.getFullYear(), EndDate.getMonth(), 1); // Start of present month
+            const PreviousMonthStartDate = new Date(EndDate.getFullYear(), EndDate.getMonth() - 1, 1); // Start of previous month
+            const TwoMonthsAgoStartDate = new Date(EndDate.getFullYear(), EndDate.getMonth() - 2, 1); // Start of month before previous month
+    
+            const PresentUserBookedData = await BookingModel.find({
+                AdminId: Adminid,
+                paymentstatus: "success",
+                date: {
+                    $gte: PresentMonthStartDate,
+                    $lt: EndDate // End date (today)
+                }
+            }).countDocuments();
+    
+            const PreviousUserBookedData = await BookingModel.find({
+                AdminId: Adminid,
+                paymentstatus: "success",
+                date: {
+                    $gte: PreviousMonthStartDate,
+                    $lt: PresentMonthStartDate
+                }
+            }).countDocuments();
+    
+            const TwoMonthsAgoUserBookedData = await BookingModel.find({
+                AdminId: Adminid,
+                paymentstatus: "success",
+                date: {
+                    $gte: TwoMonthsAgoStartDate,
+                    $lt: PreviousMonthStartDate
+                }
+            }).countDocuments();
+    
+            console.log(PresentUserBookedData, "user Data for Present Month");
+            console.log(PreviousUserBookedData, "user Data for Previous Month");
+            console.log(TwoMonthsAgoUserBookedData, "user Data for Two Months Ago");
+            console.log(PresentMonthStartDate, "Present Month Start Date");
+            console.log(PreviousMonthStartDate, "Previous Month Start Date");
+            console.log(TwoMonthsAgoStartDate, "Two Months Ago Start Date");
+    
+            res.status(200).json({ PresentMonthStartDate, PreviousMonthStartDate, TwoMonthsAgoStartDate, PresentUserBookedData, PreviousUserBookedData, TwoMonthsAgoUserBookedData });
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    };
+    
+    
+
+    // const DashboardChart = async(req,res)=>{
+    //     try {
+    //         console.log("Reached at dashboard Chart Backend")
+    //         const UserData = await BookingModel.find({AdminId:req.body.userId},{ date: 1 }).populate("bookedhubid");
+    //         if(UserData){
+    //             res.status(200).json({UserData,message:"Successfully got"})
+    //         }else{
+    //             res.status(200).json({message:"Something went wrong"})
+    //         }
+    //         console.log(UserData,"user Data")
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+    // }
+
     const ChatUserData = async(req,res)=>{
         try {
             console.log("Reached ChatUserData Backend ")
@@ -393,5 +462,6 @@ module.exports={
     AddOffer,
     OfferList,
     OfferDelete,
+    DashboardChart,
     ChatUserData,   
 }

@@ -5,6 +5,8 @@ const userRoutes = require("./Routes/UserRoutes")
 const mongoose = require('mongoose')
 const adminRoute = require("./Routes/AdminRoutes")
 const hubadminRoute = require("./Routes/HubAdminRoute")
+const chatRoute = require("./Routes/ChatRoutes")
+const messageRoute = require('./Routes/MessageRoute');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
@@ -30,6 +32,8 @@ app.use(cors({
 app.use('/',userRoutes)
 app.use('/admin',adminRoute)
 app.use('/hub',hubadminRoute)
+app.use('/chat',chatRoute)
+app.use('/message',messageRoute)
 app.listen(process.env.Port,()=>{
     console.log(`Server is Running at ${process.env.Port}`);
 })  
