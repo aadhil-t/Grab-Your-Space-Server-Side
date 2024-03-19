@@ -428,21 +428,6 @@ const AddOffer = async(req,res)=>{
         }
     };
     
-    const ChatUserData = async(req,res)=>{
-        try {
-            console.log("Reached ChatUserData Backend ")
-            const UserData = await UserModel.find();
-            console.log(UserData)
-            if(UserData){
-                res.status(200).json({UserData, message:"Successfull got"})
-            }else{
-                res.status(400).json({ message:"Something went wrong"})
-            }
-            console.log(UserData)
-        } catch (error) {
-            console.log(error)
-        }
-    }
 
 module.exports={
     HubAdminSingup,
@@ -458,5 +443,4 @@ module.exports={
     OfferList,
     OfferDelete,
     DashboardChart,
-    ChatUserData,   
 }

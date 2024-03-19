@@ -31,7 +31,45 @@ const GetMessages = async(req,res)=>{
     }
 }
 
+
+/////////////////// Admin Messages /////////////
+
+const GetAdminMessages = async(req,res)=>{
+    console.log("Reached at Get Message Backend")
+    const {AdminChatId} = req.params;
+    console.log(AdminChatId,"chat id")
+    try {
+        const result = await MessageModel.find({chatId:AdminChatId});
+        console.log(result)
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json(error)
+    }
+}
+
+const AddAdminMessage = async(req,res)=>{
+    console.log("Reached at Admin Message send")
+    const senderId = req.body.userId
+    console.log(senderId,"iddd")
+    const { chatId } = req.params
+    console.log(chatId,"chatid")
+    const {newMessage} = req.body
+    const message = new MessageModel({
+        chatId: chatId,
+        senderId: senderId,
+        text: newMessage,
+    });
+    try {
+        const result = await message.save();
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json(error);
+    }
+}
 module.exports ={
     AddMessage,
-    GetMessages
+    GetMessages,
+
+    GetAdminMessages,
+    AddAdminMessage
 }

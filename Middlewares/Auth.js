@@ -74,7 +74,7 @@ const hubadminAuth = async(req,res,next)=>{
             const HubAdmin = await Hubadmin.findOne({
                 _id: decode.userId
             })
-
+        
             if(HubAdmin){
                 if(HubAdmin.is_blocked == false){
                     req.body.userId = decode.userId;
