@@ -375,6 +375,7 @@ const AddOffer = async(req,res)=>{
             const PreviousMonthStartDate = new Date(EndDate.getFullYear(), EndDate.getMonth() - 1, 1); // Start of previous month
             const TwoMonthsAgoStartDate = new Date(EndDate.getFullYear(), EndDate.getMonth() - 2, 1); // Start of month before previous month
     
+
             const PresentUserBookedData = await BookingModel.find({
                 AdminId: Adminid,
                 paymentstatus: "success",
@@ -401,7 +402,18 @@ const AddOffer = async(req,res)=>{
                     $lt: PreviousMonthStartDate
                 }
             }).countDocuments();
-    
+            
+            const TotalUserBooked = ( PresentUserBookedData + PreviousUserBookedData + TwoMonthsAgoUserBookedData);
+
+            const bookings = await BookingModel.find({ AdminId: Adminid, paymentstatus:"success" });
+              let totalAmount = 0;
+               for (const booking of bookings) 
+               {
+              totalAmount += booking.totalamount;
+               }
+
+            console.log(totalAmount, "Total amount of sales");              
+            console.log(TotalUserBooked, "user Data for TotalUserBooked");  
             console.log(PresentUserBookedData, "user Data for Present Month");
             console.log(PreviousUserBookedData, "user Data for Previous Month");
             console.log(TwoMonthsAgoUserBookedData, "user Data for Two Months Ago");
@@ -409,30 +421,13 @@ const AddOffer = async(req,res)=>{
             console.log(PreviousMonthStartDate, "Previous Month Start Date");
             console.log(TwoMonthsAgoStartDate, "Two Months Ago Start Date");
     
-            res.status(200).json({ PresentMonthStartDate, PreviousMonthStartDate, TwoMonthsAgoStartDate, PresentUserBookedData, PreviousUserBookedData, TwoMonthsAgoUserBookedData });
+            res.status(200).json({ PresentMonthStartDate, PreviousMonthStartDate, TwoMonthsAgoStartDate, PresentUserBookedData, PreviousUserBookedData, TwoMonthsAgoUserBookedData, TotalUserBooked, totalAmount});
         } catch (error) {
             console.log(error);
             res.status(500).json({ error: "Internal server error" });
         }
     };
     
-    
-
-    // const DashboardChart = async(req,res)=>{
-    //     try {
-    //         console.log("Reached at dashboard Chart Backend")
-    //         const UserData = await BookingModel.find({AdminId:req.body.userId},{ date: 1 }).populate("bookedhubid");
-    //         if(UserData){
-    //             res.status(200).json({UserData,message:"Successfully got"})
-    //         }else{
-    //             res.status(200).json({message:"Something went wrong"})
-    //         }
-    //         console.log(UserData,"user Data")
-    //     } catch (error) {
-    //         console.log(error)
-    //     }
-    // }
-
     const ChatUserData = async(req,res)=>{
         try {
             console.log("Reached ChatUserData Backend ")

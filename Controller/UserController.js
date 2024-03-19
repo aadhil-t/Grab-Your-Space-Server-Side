@@ -1,5 +1,5 @@
 const User = require("../Models/UserModel");
-const Admin = require("../Models/HubAdminModel")
+const Admin = require("../Models/HubAdminModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
@@ -8,13 +8,12 @@ const Booking = require("../Models/BookingModel");
 const randomstring = require("randomstring");
 const Stripe = require("stripe");
 const booked = require("../Models/BookingModel");
-const RatingModel = require("../Models/RatingModel")
-const OfferModel = require('../Models/OfferModel')
+const RatingModel = require("../Models/RatingModel");
+const OfferModel = require("../Models/OfferModel");
 const { uploadToCloudinary } = require("../Utils/cloudinary");
 const { ObjectId } = require("mongodb");
 require("dotenv").config();
-const mongoose = require('mongoose');
-
+const mongoose = require("mongoose");
 
 const securePassword = async (password) => {
   try {
@@ -59,8 +58,8 @@ const UserSignin = async (req, res) => {
     }
   } catch (error) {
     console.log(error.message);
-      res.status(500).json({
-        message: "Internal server error",
+    res.status(500).json({
+      message: "Internal server error",
     });
   }
 };
@@ -165,7 +164,6 @@ const ViewProfile = async (req, res) => {
     const id = req.body.userId;
     const data = await User.findById(id);
     if (data) {
-      
       return res.status(200).json({ profile: data, message: "success" });
     } else {
       return res.status(400).json({ message: "Data not found" });
@@ -403,19 +401,16 @@ const PassOtpVerify = async (req, res) => {
   } catch (error) {}
 };
 
-
 const HubListing = async (req, res) => {
   try {
-    const { active, search, sortData,selectedData} = req.query;
-    console.log(active, search, sortData,selectedData, "active");
+    const { active, search, sortData, selectedData } = req.query;
+    console.log(active, search, sortData, selectedData, "active");
 
     const perpage = 4;
     let sortValue;
     let array = [];
 
-  
     const locationFilter = JSON.parse(selectedData);
-
 
     locationFilter.map((item) => {
       array.push(item.value);
@@ -426,11 +421,12 @@ const HubListing = async (req, res) => {
     let query = { is_verified: true };
 
     if (Array.isArray(locationFilter) && locationFilter.length > 0) {
-      let locationValues = locationFilter.map(item => item.value);
+      let locationValues = locationFilter.map((item) => item.value);
       query.hublocation = { $in: locationValues };
     }
 
-    if (search) { // Check if search term is provided
+    if (search) {
+      // Check if search term is provided
       query.$or = [
         { hubname: { $regex: search, $options: "i" } },
         { hublocation: { $regex: search, $options: "i" } },
@@ -442,13 +438,14 @@ const HubListing = async (req, res) => {
     } else if (sortData === "lowToHigh") {
       sortValue = 1;
     }
-    
+
     const Count = await HubModel.countDocuments(query); // Count documents based on query
     console.log(Count, "count of document");
 
-    const HubData = await HubModel.find(query).skip(skip).limit(perpage).sort({price:sortValue});
-    ; // Apply query for pagination
-
+    const HubData = await HubModel.find(query)
+      .skip(skip)
+      .limit(perpage)
+      .sort({ price: sortValue }); // Apply query for pagination
     if (HubData) {
       res.status(200).json({ HubData, Count, perpage, active });
     } else {
@@ -460,39 +457,42 @@ const HubListing = async (req, res) => {
   }
 };
 
-
 const SingleHub = async (req, res) => {
   try {
     console.log("innnn");
     const objid = req.params.objId;
     const date = req.params.selectedDate;
-    const ReviewData = await RatingModel.find({hubId:objid}).populate("userId");
-    const offerData = await OfferModel.findOne({hubId:objid})
-    console.log(ReviewData,"this is hubId");
+    const ReviewData = await RatingModel.find({ hubId: objid }).populate(
+      "userId"
+    );
+    const offerData = await OfferModel.findOne({ hubId: objid });
+    console.log(ReviewData, "this is hubId");
     console.log(req.params, "kk");
     const objectId = new mongoose.Types.ObjectId(objid);
 
     // const fullData = await Booking.find({date:date,_id:objid})
-    const fullData = await Booking.find({ date: date, bookedhubid: objectId  });
+    const fullData = await Booking.find({ date: date, bookedhubid: objectId });
 
-    console.log(fullData,"full data");
+    console.log(fullData, "full data");
 
-// Assuming FullData is the array of objects you received from the query
-// Define an empty array to store the extracted values
-const selectedSeatsValues = [];
-// Iterate over each object in FullData
-fullData.forEach((booking) => {
-    // Iterate over each entry in the selectedseats array of the current booking
-    booking.selectedseats.forEach((seat) => {
+    // Assuming FullData is the array of objects you received from the query
+    // Define an empty array to store the extracted values
+    const selectedSeatsValues = [];
+    // Iterate over each object in FullData
+    fullData.forEach((booking) => {
+      // Iterate over each entry in the selectedseats array of the current booking
+      booking.selectedseats.forEach((seat) => {
         // Push the value of each seat into the selectedSeatsValues array
         selectedSeatsValues.push(seat.value);
+      });
     });
-});
-// Now selectedSeatsValues contains all the values from the selectedseats arrays
-console.log(selectedSeatsValues);
+    // Now selectedSeatsValues contains all the values from the selectedseats arrays
+    console.log(selectedSeatsValues);
     const singleData = await HubModel.findById(objid);
     if (singleData) {
-      res.status(200).json({singleData,selectedSeatsValues ,ReviewData ,offerData});
+      res
+        .status(200)
+        .json({ singleData, selectedSeatsValues, ReviewData, offerData });
     }
     // console.log(singleData);
   } catch (error) {
@@ -503,7 +503,8 @@ console.log(selectedSeatsValues);
 const StoreBookedData = async (req, res) => {
   try {
     console.log(req.body, "enter in backend booking ");
-    const { userId, selected, selectedDate, TotalAmount, SingleHubData} = req.body;
+    const { userId, selected, selectedDate, TotalAmount, SingleHubData } =
+      req.body;
     const booked = new Booking({
       bookeduserid: userId,
       bookedhubid: SingleHubData,
@@ -512,10 +513,16 @@ const StoreBookedData = async (req, res) => {
       selectedseats: selected,
       totalamount: TotalAmount,
     });
-    console.log(booked)
+    console.log(booked);
     const bookedData = await booked.save();
     if (bookedData) {
-      res.status(200).json({ booked: true, data: bookedData ,message:"Successfully Booked"});
+      res
+        .status(200)
+        .json({
+          booked: true,
+          data: bookedData,
+          message: "Successfully Booked",
+        });
     } else {
       return res
         .status(400)
@@ -544,7 +551,14 @@ const BookedData = async (req, res) => {
       automatic_payment_methods: { enabled: true },
     });
     console.log(paymentintent.id, "intent");
-    res.status(200).json({ data,TransactionId:paymentintent.id, clientSecret: paymentintent.client_secret, message:"Payment Successfull"});
+    res
+      .status(200)
+      .json({
+        data,
+        TransactionId: paymentintent.id,
+        clientSecret: paymentintent.client_secret,
+        message: "Payment Successfull",
+      });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -553,12 +567,12 @@ const BookedData = async (req, res) => {
 
 const UpdateStatus = async (req, res) => {
   try {
-    const TraasactionId = req.body.paymentIntent.id
-    console.log(TraasactionId,"kouuuuuuuuuuiuii")
+    const TraasactionId = req.body.paymentIntent.id;
+    console.log(TraasactionId, "kouuuuuuuuuuiuii");
     console.log("enter into UpdateStatus");
     const update = await booked.updateOne(
       { _id: req.body.id },
-      { $set: { paymentstatus: "success" ,transactionid:TraasactionId } }
+      { $set: { paymentstatus: "success", transactionid: TraasactionId } }
     );
     console.log(update);
     res.status(200).json({ update, message: "update succeessfully" });
@@ -570,26 +584,29 @@ const UpdateStatus = async (req, res) => {
 const BookedHistory = async (req, res) => {
   try {
     console.log("reached backend BookedHistory");
-    const { active } = req.query
-    console.log(active,"oaoaaaoaaoao") 
+    const { active } = req.query;
+    console.log(active, "oaoaaaoaaoao");
 
     const perpage = 4;
-    const skip = (parseInt(active)-1) * perpage;
+    const skip = (parseInt(active) - 1) * perpage;
 
     const userId = req.body.userId;
-    const query = {bookeduserid : userId}  
-
+    const query = { bookeduserid: userId };
 
     const Count = await booked.countDocuments(query);
-    console.log(Count,"counttttt");
+    console.log(Count, "counttttt");
 
     const data = await booked
-      .find(query).skip(skip).limit(perpage)
+      .find(query)
+      .skip(skip)
+      .limit(perpage)
       .populate("bookedhubid")
       .populate("bookeduserid");
 
     if (data) {
-      res.status(200).json({ data, Count, perpage, active, message: "successfull" });
+      res
+        .status(200)
+        .json({ data, Count, perpage, active, message: "successfull" });
     } else {
       res.status(400).json({ message: "something went wrong !" });
     }
@@ -600,7 +617,7 @@ const BookedHistory = async (req, res) => {
 
 const ChangeProfilePassword = async (req, res) => {
   try {
-    console.log(req.body,"kkkkkkkkk")
+    console.log(req.body, "kkkkkkkkk");
     const userData = await User.findById(req.body.userId);
     const compare = await bcrypt.compare(
       req.body.changepassword,
@@ -635,7 +652,9 @@ const SetNewPassword = async (req, res) => {
       res.status(200).json({ message: "New Password Updated Successfully" });
       console.log(userData);
     } else {
-      res.status(400).json({ userData, message: "Existing Password Create New" });
+      res
+        .status(400)
+        .json({ userData, message: "Existing Password Create New" });
     }
   } catch (error) {
     console.log(error);
@@ -649,108 +668,111 @@ const ResendUserOtpVerify = async (req, res) => {
     const userData = await User.findOne({ _id: req.body.id });
     console.log(userData);
     if (userData) {
-      SendMail(
-        userData.name,
-        userData.email,
-        userData._id,
-        "resent otp"
-      );
-      res.status(200).json({userData, message:"Successfully Resent otp"})
-    }else{
-      res.status(400).json({message:"Something Went Wrong On Resent otp"})      
+      SendMail(userData.name, userData.email, userData._id, "resent otp");
+      res.status(200).json({ userData, message: "Successfully Resent otp" });
+    } else {
+      res.status(400).json({ message: "Something Went Wrong On Resent otp" });
     }
   } catch (error) {
     console.log(error);
   }
 };
 
-const ChangeDp = async(req,res)=>{
+const ChangeDp = async (req, res) => {
   try {
-    console.log("Reached at backend")
-    console.log(req.file.path,"path to the picture")
-    console.log(req.body.userId,"user id")
-    const img = req.file.path
-    const UploadDp = await uploadToCloudinary(img , "dp");
+    console.log("Reached at backend");
+    console.log(req.file.path, "path to the picture");
+    console.log(req.body.userId, "user id");
+    const img = req.file.path;
+    const UploadDp = await uploadToCloudinary(img, "dp");
     const UpdateDp = await User.findOneAndUpdate(
-      {_id : req.body.userId},
-      {$set:{
-        profileimage : UploadDp.url
-      }}
-    )
-    if(UpdateDp){
-      console.log(UpdateDp,"DP SUCCESSFULLY UPDATED")
-      res.status(200).json({UpdateDp, message:"Successfully Updated Profile Pic"})
-    }else{
-      res.status(400).json({message:"Something Went Wrong"})
+      { _id: req.body.userId },
+      {
+        $set: {
+          profileimage: UploadDp.url,
+        },
+      }
+    );
+    if (UpdateDp) {
+      console.log(UpdateDp, "DP SUCCESSFULLY UPDATED");
+      res
+        .status(200)
+        .json({ UpdateDp, message: "Successfully Updated Profile Pic" });
+    } else {
+      res.status(400).json({ message: "Something Went Wrong" });
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
 
-const ReviewRating = async(req,res)=>{
+const ReviewRating = async (req, res) => {
   try {
-    console.log(req.body)
-    const { rating, review,userId,objId} = req.body;
-    console.log(rating,review,userId,objId,"reached at backend"); 
+    console.log(req.body);
+    const { rating, review, userId, objId } = req.body;
+    console.log(rating, review, userId, objId, "reached at backend");
     const ratingData = new RatingModel({
       rating,
       review,
       userId,
-      hubId:objId,
+      hubId: objId,
     });
     const RatingData = await ratingData.save();
-    if(RatingData){
-      res.status(200).json({RatingData,message:"successfully updated"})
-    }else{
-      res.status(400).json({message:"Failed to update"})
+    if (RatingData) {
+      res.status(200).json({ RatingData, message: "successfully updated" });
+    } else {
+      res.status(400).json({ message: "Failed to update" });
     }
-    console.log(RatingData,"saved successfully")
+    console.log(RatingData, "saved successfully");
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
 
-const BookedSinglePage = async(req,res)=>{
+const BookedSinglePage = async (req, res) => {
   try {
-    console.log("Reached")
-    const bookedData = await Booking.findById({_id:req.params.BookedId}).populate('bookedhubid').populate('bookeduserid');
-    console.log(bookedData,"kitite maraa ...");
-    if(bookedData){
-      res.status(200).json({bookedData, message:"Successfull"})
-    }else{
-      res.status(200).json({bookedData, message:"Successfull"})
+    console.log("Reached");
+    const bookedData = await Booking.findById({ _id: req.params.BookedId })
+      .populate("bookedhubid")
+      .populate("bookeduserid");
+    console.log(bookedData, "kitite maraa ...");
+    if (bookedData) {
+      res.status(200).json({ bookedData, message: "Successfull" });
+    } else {
+      res.status(200).json({ bookedData, message: "Successfull" });
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
 
-const CancelBooking = async(req,res)=>{
+const CancelBooking = async (req, res) => {
   try {
-    console.log("Reached at Backend CancelBooking ")
-    const {userId, hubId, BookedId} = req.body
-    console.log(userId,hubId,BookedId,"got it man")
-    const BookedData = await Booking.findOne({_id:BookedId});
-    console.log(BookedData)
-    if(BookedData){
-      const walletAmount = await User.findOne({_id:userId});
+    console.log("Reached at Backend CancelBooking ");
+    const { userId, hubId, BookedId } = req.body;
+    console.log(userId, hubId, BookedId, "got it man");
+    const BookedData = await Booking.findOne({ _id: BookedId });
+    console.log(BookedData);
+    if (BookedData) {
+      const walletAmount = await User.findOne({ _id: userId });
       const balance = walletAmount.wallet + BookedData.totalamount;
-      await User.updateOne( { _id : userId } , {$set: { wallet : balance } });
+      await User.updateOne({ _id: userId }, { $set: { wallet: balance } });
       await Booking.findOneAndUpdate(
-        { _id : BookedId },
-        { $set : { paymentstatus : "cancel" } });
+        { _id: BookedId },
+        { $set: { paymentstatus: "cancel" } }
+      );
 
-        res.status(200).json({message:"Your booking has been successfully cancelled"})
-    }
-    else{
-      res.status(400).json({message:"Something Went Wrong"})
+      res
+        .status(200)
+        .json({ message: "Your booking has been successfully cancelled" });
+    } else {
+      res.status(400).json({ message: "Something Went Wrong" });
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
- 
+};
+
 // const ChatAdminData = async(req,res)=>{
 //   try {
 //     console.log("Reached ChatAdminData Backend")

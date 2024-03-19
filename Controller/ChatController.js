@@ -1,6 +1,6 @@
 const ChatModel = require('../Models/ChatModel');
 
-
+///////////////// User Chat Section ////////////////
 const CreateChat = async(req,res)=>{
     try {
     console.log("bodyReached CreateChat")
@@ -26,6 +26,11 @@ const UserChats = async(req,res)=>{
         console.log(AdminId,"Got it")
         const Chat = await ChatModel.find({
             members: {$in : [AdminId]}
+        }).populate({
+            path:"members",
+            select:"name",
+            match:{_id: {$eq:AdminId}},
+            model:"hubadmin"
         })
         console.log(Chat)
         res.status(200).json(Chat);
@@ -43,10 +48,29 @@ const FindChat = async(req,res)=>{
     } catch (error) {
         res.status(500).json(error);
     }
+} 
+
+///////////////// Admin Chat Section ////////////////
+const CreateAdminChat = async(req,res)=>{
+    try {
+    console.log("bodyReached CreateChat")
+    const {adminId,userId} = req.params 
+    console.log(adminId,"Para CreateChat")
+    console.log(userId,"Para CreateChat")
+    const newChat = new ChatModel({
+        members: [userId, adminId],
+    });
+        const result = await newChat.save();
+        if(result){
+            res.status(200).json(result)
+        }
+     } catch (error) {
+        res.status(500).json(error);
+     }
 }
 
 module.exports={
     CreateChat,
     UserChats,
-    FindChat
+    FindChat,
 }
