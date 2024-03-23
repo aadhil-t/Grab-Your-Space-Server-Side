@@ -30,6 +30,7 @@ router.post("/dpchange",multer.uploadOption.single("dp"),Auth.userAuth,userContr
 router.post("/userrating",Auth.userAuth,userController.ReviewRating)
 router.get("/bookedsingledata/:BookedId",Auth.userAuth,userController.BookedSinglePage)
 router.post("/cancelbook",Auth.userAuth,userController.CancelBooking)
+router.get("/homehubdeatils",Auth.userAuth,userController.HomeHubDetails)
 
 
 module.exports = router 

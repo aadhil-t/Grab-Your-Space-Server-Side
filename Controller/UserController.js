@@ -773,6 +773,21 @@ const CancelBooking = async (req, res) => {
   }
 };
 
+const HomeHubDetails = async(req,res)=>{
+  try {
+    console.log(req.body,"reached at HomeHubDetails")
+    const Hubdata = await HubModel.find({is_verified:true});
+    if(Hubdata){
+      res.status(200).json({Hubdata,message:"successfully got"})
+    }else{
+      res.status(400).json({message:"Something went wrong"})
+    }
+    console.log(Hubdata)
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 
 module.exports = {
   UserSignin,
@@ -799,4 +814,5 @@ module.exports = {
   ReviewRating,
   BookedSinglePage,
   CancelBooking,
+  HomeHubDetails,
 };

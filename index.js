@@ -11,6 +11,8 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
 dotenv.config()
+const socket = require("./Socket/Socket");
+
 mongoose.connect(process.env.Mongoconnect,{
 
 }).then(()=>{
