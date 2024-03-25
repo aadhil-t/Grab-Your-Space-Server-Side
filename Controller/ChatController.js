@@ -1,3 +1,4 @@
+const { adminAuth } = require('../Middlewares/Auth');
 const ChatModel = require('../Models/ChatModel');
 
 ///////////////// User Chat Section ////////////////
@@ -21,18 +22,22 @@ const CreateChat = async(req,res)=>{
 
 const UserChats = async(req,res)=>{
     try {
-        console.log("Reached UserChat Backend")
+        console.log("Reached UserChat Backend-----------------------")
         const {AdminId} = req.params;
-        console.log(AdminId,"Got it")
+        console.log(AdminId,"ggggggggggggggggggggggggggggggggggg");
+        console.log(req.body.userId,"Got it")
         const Chat = await ChatModel.find({
-            members: {$in : [AdminId]}
+            members: {$in : [req.body.userId]}
         }).populate({
             path:"members",
             select:"name",
-            match:{_id: {$eq:AdminId}},
+            // match:{_id: {$eq:AdminId}}, 
             model:"hubadmin"
         })
-        console.log(Chat)
+
+        // const chat = await ChatModel.find({_id:})
+
+        console.log(Chat,"iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
         res.status(200).json(Chat);
     } catch (error) {
         res.status(500).json(error);
@@ -61,7 +66,7 @@ const AdminChat = async (req, res) => {
         }).populate({
             path:"members",
             select:"name profileimage",
-            match:{_id: {$ne:AdminId}},
+            // match:{_id: {$ne:AdminId}}, 
             model:"user"
         })
         console.log(chat)

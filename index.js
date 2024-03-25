@@ -1,5 +1,4 @@
 const express = require("express")
-const app = express()
 const cors = require ('cors')
 const userRoutes = require("./Routes/UserRoutes")
 const mongoose = require('mongoose')
@@ -11,7 +10,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
 dotenv.config()
-const socket = require("./Socket/Socket");
+const { app,server} = require("./Socket/Socket");
 
 mongoose.connect(process.env.Mongoconnect,{
 
@@ -36,6 +35,6 @@ app.use('/admin',adminRoute)
 app.use('/hub',hubadminRoute)
 app.use('/chat',chatRoute)
 app.use('/message',messageRoute)
-app.listen(process.env.Port,()=>{
+server.listen(process.env.Port,()=>{
     console.log(`Server is Running at ${process.env.Port}`);
 })  
