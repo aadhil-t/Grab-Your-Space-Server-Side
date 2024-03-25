@@ -3,16 +3,16 @@ const MessageModel = require('../Models/MessageModel');
 
 const AddMessage = async(req,res)=>{
     const senderId = req.body.userId
-    const { chatid } = req.params
-    console.log(req.params,"chatid Id")
+    const { receverId } = req.params
     const {newMessage} = req.body
     const message = new MessageModel({
-        chatId: chatid,
+        chatId: receverId,
+        receiverId:receverId,
         senderId: senderId,
         text: newMessage,
     });
     try {
-        const result = await message.save();
+        const result = await message.save()
         res.status(200).json(result);
     } catch (error) {
         res.status(500).json(error);
@@ -48,20 +48,18 @@ const GetAdminMessages = async(req,res)=>{
 }
 
 const AddAdminMessage = async(req,res)=>{
-    console.log("Reached at Admin Message send")
+    try {
     const senderId = req.body.userId
-    console.log(senderId,"iddd")
-    const { chatId } = req.params
-    console.log(chatId,"chatid")
+    const { receverId } = req.params
     const {newMessage} = req.body
     const message = new MessageModel({
-        chatId: chatId,
+        chatId: receverId,
+        receiverId:receverId,
         senderId: senderId,
         text: newMessage,
     });
-    try {
-        const result = await message.save();
-        res.status(200).json(result);
+    const result = await message.save()
+        return  res.status(200).json(result);
     } catch (error) {
         res.status(500).json(error);
     }
@@ -69,7 +67,6 @@ const AddAdminMessage = async(req,res)=>{
 module.exports ={
     AddMessage,
     GetMessages,
-
     GetAdminMessages,
     AddAdminMessage
 }

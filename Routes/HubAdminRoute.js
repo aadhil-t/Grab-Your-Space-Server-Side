@@ -26,6 +26,8 @@ hubadminRoute.get('/dashboardchart',Auth.hubadminAuth,HubAdminController.Dashboa
 ///////////////////// Aadmin Chat //////////////////// 
 hubadminRoute.get("/adminchat/:AdminId", ChatController.AdminChat);
 hubadminRoute.get("/getadminmessage/:AdminChatId", MessageController.GetAdminMessages);
-hubadminRoute.post("/adminmessagesend/:chatId",Auth.hubadminAuth,MessageController.AddAdminMessage);
+// hubadminRoute.post("/adminmessagesend/:receverId",Auth.hubadminAuth,MessageController.AddAdminMessage);
+hubadminRoute.post("/adminmessagesend/:receverId",Auth.hubadminAuth,MessageController.AddAdminMessage);
+
 
 module.exports = hubadminRoute

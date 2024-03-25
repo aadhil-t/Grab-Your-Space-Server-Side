@@ -66,7 +66,7 @@ const AdminChat = async (req, res) => {
         }).populate({
             path:"members",
             select:"name profileimage",
-            // match:{_id: {$ne:AdminId}}, 
+            // match:{_id: {$ne:AdminId}},
             model:"user"
         })
         console.log(chat)
