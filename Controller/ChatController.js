@@ -24,7 +24,6 @@ const UserChats = async(req,res)=>{
     try {
         console.log("Reached UserChat Backend-----------------------")
         const {AdminId} = req.params;
-        console.log(AdminId,"ggggggggggggggggggggggggggggggggggg");
         console.log(req.body.userId,"Got it")
         const Chat = await ChatModel.find({
             members: {$in : [req.body.userId]}
@@ -37,7 +36,6 @@ const UserChats = async(req,res)=>{
 
         // const chat = await ChatModel.find({_id:})
 
-        console.log(Chat,"iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
         res.status(200).json(Chat);
     } catch (error) {
         res.status(500).json(error);
@@ -60,7 +58,6 @@ const AdminChat = async (req, res) => {
     try {
         console.log("Reached AdminChat Backend by ar");
         const { AdminId } = req.params
-        console.log( AdminId,"admin Id from params");
         const chat = await ChatModel.find({
             members: {$in : [AdminId]}
         }).populate({
@@ -69,7 +66,6 @@ const AdminChat = async (req, res) => {
             // match:{_id: {$ne:AdminId}},
             model:"user"
         })
-        console.log(chat)
         res.status(200).json({chat,message:"Reached AdminChat Backend"});
     } catch (error) {
         res.status(500).json(error);

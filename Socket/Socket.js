@@ -2,7 +2,6 @@ const { Server } = require("socket.io");
 const express = require('express');
 const http = require('http');
 const cors = require('cors');
-const { log } = require("console");
 
 const app = express();
 const server = http.createServer(app);
@@ -29,6 +28,7 @@ io.on("connection", (socket) => {
 
   socket.on("send-message", (data) => {
       const { receiverId } = data;
+
       const user = activeUsers.find((user) => user.userId === receiverId);
       if (user) {
          io.to(user.socketId).emit("receive-message",data);

@@ -22,7 +22,6 @@ const AddMessage = async(req,res)=>{
 const GetMessages = async(req,res)=>{
     console.log("Reached at Get Message Backend")
     const {chatId} = req.params;
-    console.log(chatId,"chat id")
     try {
         const result = await MessageModel.find({chatId});
         res.status(200).json(result);
@@ -35,12 +34,9 @@ const GetMessages = async(req,res)=>{
 /////////////////// Admin Messages /////////////
 
 const GetAdminMessages = async(req,res)=>{
-    console.log("Reached at Get Message Backend")
     const {AdminChatId} = req.params;
-    console.log(AdminChatId,"chat id")
     try {
         const result = await MessageModel.find({chatId:AdminChatId});
-        console.log(result)
         res.status(200).json(result);
     } catch (error) {
         res.status(500).json(error)
