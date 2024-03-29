@@ -132,6 +132,7 @@ const VerifyEmail = async(req,res)=>{
                          );
 
                          if(update){  
+                            console.log("Update...............")
                             const hubdata = await HubAdmin.findOne({_id: verifyLink.id})
                             const hubtoken = jwt.sign({userId: hubdata.id},process.env.HubAdminSecret,{ expiresIn:"1h"})
 
@@ -165,7 +166,6 @@ const HubAdminLogin = async(req,res)=>{
                     }else{
                         const Hubadmindata = emailExist;
                         const hubadmintoken = jwt.sign({ userId: emailExist.id},process.env.HubAdminSecret,{expiresIn:"1h"})
-
                         return res.status(200).json({ status:true, Hubadmindata, hubadmintoken,message:"Your account loged successfully"})
                     }
                 }
