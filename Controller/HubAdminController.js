@@ -374,7 +374,9 @@ const AddOffer = async(req,res)=>{
             const PresentMonthStartDate = new Date(EndDate.getFullYear(), EndDate.getMonth(), 1); // Start of present month
             const PreviousMonthStartDate = new Date(EndDate.getFullYear(), EndDate.getMonth() - 1, 1); // Start of previous month
             const TwoMonthsAgoStartDate = new Date(EndDate.getFullYear(), EndDate.getMonth() - 2, 1); // Start of month before previous month
-    
+            
+            const boo = await BookingModel.find({AdminId:Adminid})
+            console.log(boo,"kkkkkkkkkk");
 
             const PresentUserBookedData = await BookingModel.find({
                 AdminId: Adminid,
@@ -384,7 +386,7 @@ const AddOffer = async(req,res)=>{
                     $lt: EndDate // End date (today)
                 }
             }).countDocuments();
-    
+            
             const PreviousUserBookedData = await BookingModel.find({
                 AdminId: Adminid,
                 paymentstatus: "success",
@@ -393,7 +395,7 @@ const AddOffer = async(req,res)=>{
                     $lt: PresentMonthStartDate
                 }
             }).countDocuments();
-    
+            
             const TwoMonthsAgoUserBookedData = await BookingModel.find({
                 AdminId: Adminid,
                 paymentstatus: "success",
@@ -402,6 +404,7 @@ const AddOffer = async(req,res)=>{
                     $lt: PreviousMonthStartDate
                 }
             }).countDocuments();
+            
             
             const TotalUserBooked = ( PresentUserBookedData + PreviousUserBookedData + TwoMonthsAgoUserBookedData);
 
